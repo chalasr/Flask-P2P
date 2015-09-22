@@ -6,6 +6,16 @@
          * > "you don't have to plus %0 together, you can format %0 %1%% of the time now!".format('strings', 100)
          * "you don't have to plus strings together, you can format strings 100% of the time now!"
          */
+
+         navigator.webkitGetUserMedia(
+           {"video": true, "audio": false},
+           function(stream){
+              var videoTracks = stream.getVideoTracks();
+              document.querySelector('video').src =
+              window.URL.createObjectURL(stream);
+           },
+           function(e){console.log(e);}
+         );
         strings.f = function () {
             var args = arguments;
             return this.replace(regex, function(token) {
