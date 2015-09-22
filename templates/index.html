@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flask OTR WebRTC Demo</title>
+    <link rel="stylesheet" type="text/css" href="/static/vendor/fontawesome/css/font-awesome.css" />
+    <style>
+        body {
+            background: #272B30;
+            color: #eee;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 13px;
+        }
+        input[type="text"], 
+        textarea {
+            background: #0d0d0d;
+            color: #eee;
+            padding: 8px;
+            border-radius: 2px;
+            border: 1px solid #303030;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 13px;
+        }
+        h1 {
+            text-align: center;
+        } 
+        #app {
+            position: absolute;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+        #header {
+            position: absolute;
+            background: linear-gradient(#8A9196, #7A8288 60%, #70787D);
+            border-bottom: 1px solid #697075;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+            border-bottom: #000;
+            left: 0;
+            right: 0;
+            top: 0;
+            padding: 7px 10px;
+        }
+        #connection {
+            float: right;
+        }
+        #user {
+            float: left;
+        }
+        #messages {
+            position: absolute;
+            top: 45px;
+            left: 0;
+            right: 0;
+            bottom: 27px;
+            overflow: auto;
+        }
+        #buffer {
+            position: absolute;
+            bottom: 0px;
+            left: 0;
+            right: 12px;
+        }
+        textarea {
+            width: 100%;
+            height: 15px;
+            padding: 5px;
+            resize: none;
+        }
+        #user_icon,
+        #room .fa,
+        #settings_icon {
+            font-size: 25px;
+        }
+        #room {
+            text-align: center;
+        }
+        #connection_icon {
+            font-size: 16px;
+        }
+        #connection_status {
+            vertical-align: middle;
+            display: inline-block;
+        }
+        .fa {
+            vertical-align: middle;
+        }
+        .online {
+            color: green;
+        }
+        .offline {
+            color: #666;
+        }
+        .success {
+            color: #62C462;
+        }
+        .error {
+            color: #EE5F5B;
+        }
+        .operation {
+            color: #F89406;
+        }
+        .info {
+            color: #5BC0DE;
+        }
+
+        .message .fa-lock {
+            color: green;
+        }
+        .message .chat-user,
+        .message .fa-lock,
+        .message .message-inner {
+            vertical-align: middle;
+            margin-left: 3px;
+        }
+    </style> 
+</head>
+<body>
+    <div id="app">
+        <div id="header">
+            <div id="user">
+                <span id="user_icon" class="fa fa-user"></span>
+                <span id="username">Anonymous</span>
+            </div>
+            <div id="connection">
+                <span id="connection_icon" class="fa fa-circle offline"></span>
+                <span id="connection_status">Not connected</span>
+                <span id="settings_icon" class="fa fa-gear"></span>
+            </div>
+            <div id="room">
+                <span id="room_icon" class="fa fa-street-view"></span>
+                <span id="room_name">Lobby</span>
+            </div>
+        </div>
+        <div id="messages"></div>
+        <div id="buffer">
+            <textarea id="buffer_input"></textarea>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="static/vendor/jquery.min.js"></script> 
+    <script type="text/javascript" src="static/vendor/otr/dep/bigint.js"></script> 
+    <script type="text/javascript" src="static/vendor/otr/dep/crypto.js"></script> 
+    <script type="text/javascript" src="static/vendor/otr/dep/eventemitter.js"></script> 
+    <script type="text/javascript" src="static/vendor/otr/dep/salsa20.js"></script> 
+    <script type="text/javascript" src="static/vendor/otr/otr.min.js"></script>
+
+    <script type="text/javascript" src="static/js/chat.js"></script> 
+    <script type="text/javascript" src="static/js/log.js"></script> 
+</body>    
+</html>
