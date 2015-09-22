@@ -17,7 +17,7 @@
     rtc.log_event_source_message = true;
 
     rtc
-    
+
     .on('error', function(error) {
         log('[ERROR] ' + error);
     })
@@ -58,13 +58,13 @@
     })
     .on('ice_state_chjange', function(event) {
         log('new ICE state: ' + event.target.iceConnectionState, event);
-    }) 
+    })
     .on('add_data_channel', function(username, event) {
         log('Added data cannel for ' + username, event);
     })
     .on('pc_error', function(username, event) {
         log('Peer connection error with ' + username, event);
-    }) 
+    })
     .on('set_local_description', function(username) {
         log('Set LocalDescription for ' + username);
     })
@@ -82,7 +82,7 @@
     })
     .on('receive_answer', function(username, sdp_in) {
         log('received PC answer from ' + username, sdp_in);
-    })  
+    })
     .on('set_remote_description', function(username) {
         log('Set RemoteDescription for '+ username);
     })
@@ -170,7 +170,7 @@
     .on('otr_stream_error', function(username, error) {
         log('[OTR] Steam error with ' + username, error);
     })
-   
+
 
     /* Chat Application */
     .on('set_username_success', function(username) {

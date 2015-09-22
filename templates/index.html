@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="app">
 <head>
     <title>Flask OTR WebRTC Demo</title>
     <link rel="stylesheet" type="text/css" href="/static/vendor/fontawesome/css/font-awesome.css" />
@@ -116,7 +116,7 @@
         }
     </style>
 </head>
-<body>
+<body ng-controller="MainController">
     <div id="app">
         <div id="header">
             <div id="user">
@@ -135,12 +135,19 @@
         </div>
         <div id="messages"></div>
         <video style="float:right!important;" id="gum-local" autoplay></video>
+        <div class="">
+
+        </div>
         <div id="buffer">
             <textarea id="buffer_input"></textarea>
         </div>
     </div>
 
     <script type="text/javascript" src="static/vendor/jquery.min.js"></script>
+    <script type="text/javascript" src="static/js/adapter.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.min.js"></script>
+    <script type="text/javascript" src="static/app.js"></script>
+    <!-- <script type="text/javascript" src="static/js/MainCtrl.js"></script> -->
     <script type="text/javascript" src="static/vendor/otr/dep/bigint.js"></script>
     <script type="text/javascript" src="static/vendor/otr/dep/crypto.js"></script>
     <script type="text/javascript" src="static/vendor/otr/dep/eventemitter.js"></script>
@@ -148,6 +155,5 @@
     <script type="text/javascript" src="static/vendor/otr/otr.min.js"></script>
 
     <script type="text/javascript" src="static/js/chat.js"></script>
-    <script type="text/javascript" src="static/js/log.js"></script>
 </body>
 </html>
