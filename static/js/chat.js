@@ -5,7 +5,6 @@
     $interpolateProvider.endSymbol('%>');
 }));
 
-
 (function(app) {
 
   app.controller('MainController', function ($sce,$rootScope, $scope, $filter) {
@@ -366,7 +365,8 @@
                  $rootScope.$apply();
                  console.log($scope.peers);
                },
-               function(e){console.log(e);}
+               function(e){console.log(e);
+              }
              );
               channel.onopen = function() {
                   channel.binaryType = 'arraybuffer';

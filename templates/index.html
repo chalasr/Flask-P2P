@@ -137,7 +137,7 @@
         <video style="float:right!important;height:200px;" id="gum-local" autoplay></video>
         <div class="video-wrapper">
           <video-player style="height: 250px;margin-top: 25%" ng-repeat="peer in peers">
-              <video id="<% peer.username %>" ng-src="<% getVideo(peer.stream) %>"></video>
+              <video autoplay id="<% peer.username %>" ng-src="<% getVideo(peer.stream) %>"></video>
           </video-player>
         </div>
         <div class="">
