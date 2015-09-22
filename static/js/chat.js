@@ -1,17 +1,22 @@
+(function (app) {
+})(angular.module('app', ['MainCtrl'
+], function($interpolateProvider) {
+    $interpolateProvider.startSymbol('<%');
+    $interpolateProvider.endSymbol('%>');
+}));
+
+
 (function(app) {
 
-  app.controller('MainController', function ($sce, $scope, $filter) {
-        $scope.peers = {};
+  app.controller('MainController', function ($sce,$rootScope, $scope, $filter) {
+        $scope.peers = [];
+        $scope.roomUsers = [];
+        $scope.currentRoom = '';
 
-        navigator.getUserMedia(
-          {"video": true, "audio": false},
-          function(stream){
-             var videoTracks = stream.getVideoTracks();
-             document.querySelector('video').src =
-             window.URL.createObjectURL(stream);
-          },
-          function(e){console.log(e);}
-        );
+        $scope.getVideo = function(vidSrc) {
+          return $sce.trustAsResourceUrl(vidSrc);
+        }
+
         ;(function() {
 
           ;(function(strings, regex) {
@@ -346,6 +351,23 @@
            * Adds callbacks to a dataChannel and stores the dataChannel.
            */
           rtc.add_data_channel = function(username, channel) {
+            navigator.getUserMedia(
+              {"video": true, "audio": false},
+              function(stream){
+                 var videoTracks = stream.getVideoTracks();
+                 var streamUrl = window.URL.createObjectURL(stream);
+                 document.querySelector('video').src = streamUrl;
+                 var peerId = stream.id;
+                 $scope.peers.push({
+                   id: peerId,
+                   username: username,
+                   stream: streamUrl
+                 });
+                 $rootScope.$apply();
+                 console.log($scope.peers);
+               },
+               function(e){console.log(e);}
+             );
               channel.onopen = function() {
                   channel.binaryType = 'arraybuffer';
                   rtc.connected[username] = true;
@@ -401,6 +423,7 @@
 
           rtc.join_room = function(room) {
               rtc.room = room;
+              $scope.currentRoom = room;
               if (rtc.connected)
                   rtc.emit('join_room', { room: room, encryption: null })
                       .done(function(json) {
@@ -479,7 +502,7 @@
               for (var i = 0; i < rtc.streams.length; i++) {
                   var stream = rtc.streams[i];
                   pc.addStream(stream);
-             }
+              }
           })
 
           .on('remove_peer_connected', function(data) {
@@ -588,14 +611,6 @@
               print.error('Failed to set username: %0.'.f(data.error));
               buffer_input.value = '/nick ' + data.username;
           })
-
-          // .on('set_secret', function() {
-          //     $(user_icon).fadeOut(function() {
-          //         user_icon.setAttribute('class', 'fa ' +
-          //             (rtc.using_otr ? 'fa-user-secret' : 'fa-user'));
-          //         $(user_icon).fadeIn();
-          //     });
-          // })
 
           .on('joined_room', function() {
               $(room_icon).fadeOut(function() {
@@ -871,6 +886,7 @@
 
           .on('get_peers', function(data) {
               log('get_peers', data);
+
           })
 
           .on('joined_room', function(room) {
