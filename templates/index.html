@@ -8,7 +8,7 @@
 
     <title>Python</title>
     <link rel="stylesheet" type="text/css" href="static/vendor/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="static/vendor/css/stylewhite.css" />
+    <link rel="stylesheet" type="text/css" href="static/vendor/css/style.css" />
     <link rel="stylesheet" type="text/css" href="static/vendor/fontawesome/css/font-awesome.css"/>
 </head>
 
@@ -32,14 +32,10 @@
                     </li>
                     <li class="dropdown">
                         <a href="" class="dropdown-toggle" data-toggle="dropdown">Rooms<b class="caret"></b></a>
-                        <ul class="dropdown-menu multi-column columns-2">
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <ul class="multi-column-dropdown">
-                                        <li><a href="#">Breaks</a></li>
-                                    </ul>
-                                </div>
-                            </div>
+                        <ul class="dropdown-menu">
+                            <ul class="column-dropdown">
+                                <li><a href="#">Breaks</a></li>
+                            </ul>
                         </ul>
                     </li>
                 </ul>
@@ -57,23 +53,25 @@
             </div>
         </div>
     </nav>
+    <div class="container">
 
-    <div id="messages">
+        <div class="col-md-6" id="messages">
+
+        </div>
+
+        <div class="col-md-6 video-wrapper">
+          <video id="localVideo" style="float:right;max-width:50%;" autoplay></video>
+            <video-player ng-repeat="peer in peers">
+                <video autoplay style="float:right;max-width:50%;" id="<% peer.username %>" ng-src="<% getVideo(peer.stream) %>"></video>
+            </video-player>
+        </div>
 
     </div>
-    <video id="localVideo" style="float:right!important;height:200px;" autoplay></video>
 
-    <div class="video-wrapper">
-        <video-player style="height: 250px;margin-top: 25%" ng-repeat="peer in peers">
-            <video autoplay id="<% peer.username %>" ng-src="<% getVideo(peer.stream) %>"></video>
-        </video-player>
-    </div>
-
-    <div class="">
-    </div>
-
-    <div id="buffer">
-        <textarea class="form-control" id="buffer_input"></textarea>
+    <div class="col-lg-12" style="position:absolute; bottom:20px">
+      <div id="buffer">
+          <textarea class="form-control" id="buffer_input"></textarea>
+      </div>
     </div>
 
     <script type="text/javascript" src="static/vendor/jquery.min.js"></script>

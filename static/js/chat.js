@@ -577,10 +577,6 @@
       })
 
       .on('joined_room', function() {
-          $(room_icon).fadeOut(function() {
-              room_icon.setAttribute('class', 'fa fa-users');
-              $(room_icon).fadeIn();
-          });
           $(room_name).html(rtc.room);
       })
 
