@@ -30,13 +30,16 @@
                     <li>
                         <a id="username"><i class="fa fa-user"></i> Anonymous</a>
                     </li>
-                    <li class="dropdown">
+                    <li class="dropdown"  ng-init="getRooms()">
                         <a href="" class="dropdown-toggle" data-toggle="dropdown">Rooms<b class="caret"></b></a>
                         <ul class="dropdown-menu multi-column columns-2">
                             <div class="row">
                                 <div class="col-sm-6">
+                                    <ul class="multi-column-dropdown" ng-repeat="room in rooms">
+                                        <li><a href="#"><% room %></a></li>
+                                    </ul>
                                     <ul class="multi-column-dropdown">
-                                        <li><a href="#">Breaks</a></li>
+                                        <li><a href="" id="reloadRooms">Reload <i class="fa fa-refresh"></i></a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -80,7 +83,6 @@
     <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="static/js/adapter.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.min.js"></script>
-    <script type="text/javascript" src="static/js/services/videostream.js"></script>
     <script type="text/javascript" src="static/js/chat.js"></script>
 </body>
 </html>

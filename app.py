@@ -349,9 +349,12 @@ def on_send_answer():
     )
     return jsonify(success=True)
 
-@app.route('/get_rooms', methods=['GET'])
-def get_rooms(self):
-    return jsonify(self.rooms)
+@app.route('/get_rooms', methods=['GET', 'POST'])
+def get_rooms():
+    getRooms = []
+    for room in rtc.rooms:
+        getRooms.insert(0, room)
+    return jsonify(getRooms)
 
 
 if __name__ == '__main__':
