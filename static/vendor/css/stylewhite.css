@@ -1,0 +1,257 @@
+@import url(http://fonts.googleapis.com/css?family=Lato:300,400,700,900);
+@import url(http://fonts.googleapis.com/css?family=Raleway:400,300,700,900);
+body {
+  padding-top: 70px;
+  font-family: "Lato";
+  background-color: #E7E7E7;
+  /*background: repeating-linear-gradient(
+  45deg,
+  #90CA0A,
+  #90CA0A 10px,
+  #E7E7E7 10px,
+  #E7E7E7 20px );*/
+}
+
+a {
+   outline: none!important;
+}
+.navbar-default {
+    background-color: #FFF;
+}
+
+.navbar-brand {
+	color:#90CA0A!important;
+	font-family:"Raleway";
+	font-size:21px;
+	font-weight:bold;
+}
+
+.navbar-default .navbar-nav > li > a:focus, .navbar-default .navbar-nav > li > a:hover {
+    color:#90CA0A!important;
+    background-color: transparent;
+}
+
+.navbar  {
+	max-height:50px;
+}
+
+.navbar a {
+
+}
+
+.btn-primary {
+	color:#FFF;
+	background-color:#90CA0A;
+	border-color:#FFF;
+}
+
+.btn-primary.active, .btn-primary.focus, .btn-primary:active, .btn-primary:focus, .btn-primary:hover, .open > .dropdown-toggle.btn-primary {
+    color: #90CA0A;
+    background-color: #FFF;
+    border-color: #E7E7E7;
+}
+
+.btn-default.active, .btn-default.focus, .btn-default:active, .btn-default:focus, .btn-default:hover, .open > .dropdown-toggle.btn-primary {
+    color: #FFF;
+	background-color: #90CA0A;
+	border-color:#90CA0A;
+}
+
+.navbar-default .navbar-toggle:focus, .navbar-default .navbar-toggle:hover {
+    background-color: #90CA0A;
+    color:#FFF;
+}
+
+.navbar-toggle {
+	border-style: none;
+}
+.btn-default {
+	color: #90CA0A;
+    background-color: #FFF;
+    border-style:none;
+}
+
+.btn-default:focus,
+.btn-default:active,
+.btn-default.active,
+.btn-default.focus
+{
+  background-color: #FFF;
+  color:#90CA0A;
+}
+
+.search{
+	margin-top: 5px;
+	margin-left: 5px;
+}
+
+.searchbtn {
+	float: left;
+	width: 15%;
+
+}
+
+.form-control:focus {
+	border-color: #90CA0A;
+	box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 8px rgba(44, 179, 30, 0.6);
+}
+
+.titlecontainer {
+	width:100%;
+}
+
+.titlecontainer h1 {
+	font-family:"Raleway";
+}
+
+#searchbar {
+	height:40px;
+	width: 85%;
+	float: left;
+	text-transform: uppercase;
+	margin-bottom:6px;
+}
+
+#searchbtn {
+	width: 15%;
+	float: left;
+	height:40px;
+	box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 8px rgba(44, 179, 30, 0.6);
+	color:#90CA0A;
+}
+
+#searchbtn  span {
+	color:#90CA0A!important;
+}
+.searchcontainer {
+	width: 85%;
+	float: left;
+}
+
+#buffer{
+	position: absolute;
+    bottom: 0px;
+    left: 0;
+    right: 12px;
+}
+
+#buffer textarea{
+	width:100%;
+}
+
+#messages {
+	position: absolute;
+	top: 45px;
+	left: 20px;
+	right: 0;
+	bottom: 27px;
+	overflow: auto;
+}
+
+.online {
+	color: green;
+}
+.offline {
+	color: #666;
+}
+.success {
+	color: #62C462;
+}
+.error {
+	color: #EE5F5B;
+}
+.operation {
+	color: #F89406;
+}
+.info {
+	color: #5BC0DE;
+}
+
+.message .fa-lock {
+	color: green;
+}
+.message .chat-user,
+.message .fa-lock,
+.message .message-inner {
+	vertical-align: middle;
+	margin-left: 3px;
+}
+
+.input-group {
+	display:block;
+}
+
+.info {
+    position: relative;
+    bottom: 30px;
+}
+
+.jumbotron {
+	position:relative;
+	top:50px;
+	background-color:#FFF;
+	text-align: center;
+}
+
+.player {
+	margin-top:100px;
+}
+.power {
+	margin-top: 30px;
+}
+
+.dropdown-menu {
+	min-width: 200px;
+}
+
+.dropdown-menu.columns-2 {
+	min-width: 400px;
+}
+
+.dropdown-menu li a {
+	padding: 5px 15px;
+	font-weight: 300;
+}
+
+.multi-column-dropdown {
+	list-style: none;
+	padding-left:10px;
+}
+
+.multi-column-dropdown li a {
+	display: block;
+	clear: both;
+	line-height: 1.428571429;
+	color: #333;
+	white-space: normal;
+}
+
+.multi-column-dropdown li a:hover {
+	text-decoration: none;
+	color: #262626;
+	background-color: #E7E7E7;
+}
+
+.navbar-toggle{
+	width:50px;
+	padding-top:2px;
+	height:30px;
+}
+@media (max-width: 767px) {
+	.dropdown-menu.multi-column {
+		min-width: 240px !important;
+		overflow-x: hidden;
+	}
+}
+
+@media (max-width: 380px) {
+	.power img {
+		width:100%;
+	}
+}
+
+@media (max-width: 767px) {
+	.navbar {
+		max-height:100%;
+	}
+}
