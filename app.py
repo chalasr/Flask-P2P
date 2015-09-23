@@ -283,7 +283,7 @@ def on_set_name():
     return jsonify(success=True)
 
 @app.route('/join_room', methods=['POST'])
-def on_`join`_room():
+def on_join_room():
     """Join a webRTC room"""
     print 'join_room', request.form
     # TODO: room name validation
@@ -364,5 +364,5 @@ def on_send_answer():
     return jsonify(success=True)
 
 
-# if __name__ == '__main__':
-#     app.run(threaded=True)
+if __name__ == '__main__':
+    app.run(threaded=True)
