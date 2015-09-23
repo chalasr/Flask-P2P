@@ -1,4 +1,3 @@
-
 (function(app) {
     app.controller('MainController', function ($sce, $rootScope, $scope, $filter, Room) {
 
@@ -587,48 +586,6 @@
                     '</div>'
                 ).appendTo(messages_div);
             })
-            .on('send_offer', function(username) {
-                print.operation('Sending RTC offer to %0...'.f(username.bold()));
-            })
-            .on('send_offer_error', function(username) {
-                print,error('Failed to send RTC offer to %0.'.f(username.bold()));
-            })
-            .on ('receive_offer receive_answer', function(data) {
-                print.success('Received RTC offer from %0.'.f(data.username.bold()));
-            })
-            .on('set_local_description', function(username) {
-                print.success('Set local description for %0.'.f(username.bold()));
-            })
-            .on('set_local_description_error', function(username, error) {
-                print.error('Failed to set local description for %0!'.f(username.bold()));
-            })
-            .on('set_remote_description', function(username) {
-                print.success('Set remote description for %0.'.f(username.bold()));
-            })
-            .on('set_remote_description_error', function(username, error) {
-                print,error('Failed to set remote description for %0!'.f(username.bold()));
-            })
-            .on('ice_candidate', function(username) {
-                print.success('Received ICE Candidate for %0'.f(username.bold()));
-            })
-            .on('peer_connection_opened', function(username) {
-                print.success('Peer connection opened for %0'.f(username.bold()));
-            })
-            .on('add_remote_stream', function(username) {
-                print.success('Remote stream added for %0'.f(username.bold()));
-            })
-            .on('pc_error', function(username, e) {
-                print.error('PeerConnection error when coonecting with %0'.f(username.bold()));
-            })
-            .on('create_data_channel', function(username) {
-                print.operation('DataChannel starting for %0...'.f(username.bold()));
-            })
-            .on('data_stream_open', function(username) {
-                print.success('DataChannel opened for %0.'.f(username.bold()));
-            })
-            .on('data_stream_close', function(username, channel) {
-                print.error('DataChannel closed for %0.'.f(username.bold()));
-            });
 
             var command_lookup = {
                 connect: function(server) {
