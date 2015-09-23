@@ -571,10 +571,6 @@
                 buffer_input.value = '/nick ' + data.username;
             })
             .on('joined_room', function() {
-                $(room_icon).fadeOut(function() {
-                    room_icon.setAttribute('class', 'fa fa-users');
-                    $(room_icon).fadeIn();
-                });
                 $(room_name).html(rtc.room);
             })
             .on ('got_peers', function(data) {
@@ -682,7 +678,7 @@
 
             window.rtc = rtc;
             rtc.connect(document.location.origin + '/stream');
-            angular.element('#reloadRooms').click(function(event) {
+            angular.element('#reloadRooms').click(function(event){
                 event.preventDefault();
                 $scope.getRooms();
                 return false;
