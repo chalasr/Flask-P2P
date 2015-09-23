@@ -9,7 +9,7 @@
 
   app.controller('MainController', function ($sce,$rootScope, $scope, $filter) {
         $scope.peers = [];
-        $scope.currentUser = angular.element('#username').text();
+        $scope.currentUser = ''
         $scope.roomUsers = [];
         $scope.currentRoom = '';
 
@@ -17,19 +17,18 @@
           return $sce.trustAsResourceUrl(vidSrc);
         };
 
-        $scope.addPeer = function(stream) {
+        $scope.addPeer = function(stream, username) {
             var streamUrl = window.URL.createObjectURL(stream);
+            console.log('new stream from'+username+'uRL'+streamUrl);
             var peerId = stream.id;
             $scope.currentStream = stream.id;
             var newPeer = {
                 id: peerId,
+                username: username,
                 stream: streamUrl
             };
-            if($scope.currentUser){
-              newPeer.username = username;
-            }
             var count = $scope.peers.filter(function(peer){
-               return (peer.id === newPeer.id)
+               return (peer.username === newPeer.username)
             });
             if(count.length === 0) {
                 $scope.peers.push(newPeer);
@@ -229,7 +228,7 @@
                       document.getElementById('localVideo').src = window.URL.createObjectURL(stream);
                         pc.onaddstream({stream: stream});
                         pc.addStream(stream);
-                        $scope.addPeer(stream);
+
                       console.log(stream, 'STREAMVIDEO');
                    },
                    function(e){console.log(e);}
@@ -262,6 +261,7 @@
 
               pc.onaddstream = function(event) {
                   // TODO: Finalize this API
+                  $scope.addPeer(event.stream, username);
                   rtc.fire('add_remote_stream', username,  event.stream);
               };
 
@@ -450,6 +450,8 @@
 
           rtc.set_username = function(username) {
               rtc.username = username;
+              $scope.currentUser = username;
+              console.log($scope.currentUser);
               if (rtc.connected)
                   rtc.emit('set_username', { username: username })
                       .done(function() {
