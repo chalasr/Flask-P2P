@@ -13,9 +13,17 @@
       $scope.roomUsers = [];
       $scope.currentRoom = '';
       $scope.currentStream = {};
+      navigator.getUserMedia({"video": true, "audio": false},
+          function(stream){
+              document.getElementById('localVideo').src = window.URL.createObjectURL(stream);
+              console.log(stream, 'STREAMVIDEO');
+              $scope.currentStream = stream;
+           },
+           function(e){console.log(e);}
+      );
 
       $scope.getVideo = function(vidSrc) {
-          return $sce.trustAsResourceUrl(vidSrc);
+        return $sce.trustAsResourceUrl(vidSrc);
       };
 
       $scope.addPeer = function(stream, username) {
