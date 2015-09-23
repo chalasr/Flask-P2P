@@ -1,5 +1,6 @@
-;(function(rtc) {
+;(function() {
 
+    var rtc = window.rtc;
     var pad0 = function(number) { return number < 10 ? '0' + number : number }
     var log = function() {
         var args = Array.prototype.slice.call(arguments, 0);
@@ -117,6 +118,7 @@
 
     .on('get_peers', function(data) {
         log('get_peers', data);
+
     })
 
     .on('joined_room', function(room) {
@@ -126,51 +128,6 @@
     .on('user_join', function(data) {
         log(data.username + ' has joined the room');
     })
-
-    /* OTR */
-    .on('otr_init_begin', function() {
-        log('[OTR] Init begin');
-    })
-    .on('otr_init_done', function() {
-        log('[OTR] Init done');
-    })
-    .on('going_otr_with', function(username) {
-        log('[OTR] Starting off the record with ' + username);
-    })
-    .on('otr_ake_success', function(username) {
-        log('[OTR] AKE success with ' + username);
-    })
-    .on('otr_disconnect', function(username) {
-        log('[OTR] Disconnect from ' + username);
-    })
-    .on('otr_send_key', function(username) {
-        log('[OTR] Sent key to ' + username);
-    })
-    .on('otr_receive_key', function(username) {
-        log('[OTR] Received key from ' + username)
-    })
-    .on('otr_smp_start', function(username) {
-        log('[OTR] Started SMP with ' + username);
-    })
-    .on('otr_smp_wait', function(username) {
-        log('[OTR] Waiting on SMP with ' + username);
-    })
-    .on('otr_smp_question', function(username) {
-        log('[OTR] Answering SMP question for ' + username);
-    })
-    .on('otr_smp_failed', function(username, type, error) {
-        log('[OTR] SMP failed with %0 during %1 with error: %2'.f(username, type, error));
-    })
-    .on('otr_with', function(username) {
-        log('[OTR] Successfully off the reocrd with ' + username);
-    })
-    .on('otr_file_error', function(username, type) {
-        log('[OTR] File error with ' + username, type);
-    })
-    .on('otr_stream_error', function(username, error) {
-        log('[OTR] Steam error with ' + username, error);
-    })
-
 
     /* Chat Application */
     .on('set_username_success', function(username) {
@@ -184,4 +141,4 @@
 
     })
     ;
-})(rtc);
+})();
