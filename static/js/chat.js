@@ -49,11 +49,7 @@
   ;(function() {
 
       ;(function(strings, regex) {
-          /*
-           * Uses single percentage sign for formatting and double percentage sign for escaping.
-           * > "you don't have to plus %0 together, you can format %0 %1%% of the time now!".format('strings', 100)
-           * "you don't have to plus strings together, you can format strings 100% of the time now!"
-           */
+          //Parse string
           strings.f = function () {
               var args = arguments;
               return this.replace(regex, function(token) {
@@ -66,24 +62,18 @@
                   return "";
               });
           };
+          // Bold a string
           strings.bold = function() {
               return "<strong>%0</strong>".f(this);
           }
-          /*
-           * Converts a string into a unique number based off the sum of the
-           * character code values of each character.
-           */
+           // Converts a string into a unique number based off the sum of the character code values of each character.
           strings.toID = function() {
               var id = 0;
               for (var x = 0; x < this.length; x++)
                   id += this.charCodeAt(x);
               return id;
           }
-          /*
-           * Use this to avoid xss
-           * recommended escaped char's found here
-           * https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet#RULE_.231_-_HTML_Escape_Before_Inserting_Untrusted_Data_into_HTML_Element_Content
-           */
+          // Sanitize stings for avoid XSS
           strings.sanitize = function() {
               return this.replace(/[\<\>''\/]/g, function(c) {
                   var sanitize_replace = {
@@ -103,21 +93,9 @@
       /*
        * Determine the correct RTC functions and classes
        */
-      if (window.mozRTCPeerConnection) {
-          browser = 'firefox';
-          var PeerConnection = mozRTCPeerConnection;
-          var iceCandidate = mozRTCIceCandidate;
-          var SessionDescription = mozRTCSessionDescription;
-      } else if (window.PeerConnection ||
-                 window.webkitPeerConnection00 ||
-                 window.webkitRTCPeerConnection) {
-          browser = 'chrome';
-          var PeerConnection = window.PeerConnection ||
-                               window.webkitPeerConnection00 ||
-                               window.webkitRTCPeerConnection;
-          var iceCandidate = RTCIceCandidate;
-          var SessionDescription = RTCSessionDescription;
-      }
+          var PeerConnection = window.RTCPeerConnection;
+          var iceCandidate = window.RTCIceCandidate;
+          var SessionDescription = window.RTCSessionDescription;
 
       var rtc_unsupported = 0;
       var reliable_false  = 1;
@@ -179,7 +157,7 @@
        * Connects to the SSE source.
        */
       rtc.connect = function(stream_url) {
-          // Connect to server
+
           rtc.stream = new EventSource(stream_url);
           rtc.stream_url = stream_url;
           rtc.fire('connecting');
@@ -270,8 +248,6 @@
               console.log(currentStream);
           })
 
-          //if (rtc.dataChannelSupport != rtc_unsupported) {
-          /* this might need to be removed/handled differently if this is ever supported */
           pc.ondatachannel = function (event) {
               rtc.add_data_channel(username, event.channel);
               rtc.fire('add_data_channel', username, event);
@@ -404,17 +380,6 @@
           rtc.fire('data_channel_added', username, channel)
           return channel;
       }
-      // rtc.set_secret = function(secret) {
-      //     rtc.using_otr = !!secret;
-      //     rtc.otr_secret = secret;
-      //     if (rtc.using_otr) {
-      //         rtc.init_otr();
-      //     }
-      //     rtc.emit(secret ? 'otr_on' : 'otr_off')
-      //         .done(function(){ rtc.fire('set_secret'); });
-      //     ;
-      //     return this;
-      // }
 
       rtc.add_streams = function() {
           for (var i = 0; i < rtc.streams.length; i++) {
@@ -555,10 +520,7 @@
       }
       rtc.fire('data_channel_reliability');
 
-      /********************
-       * DOM interactions *
-       ********************/
-
+      //DOM INTERACTIONS (TO BE REMOVED USING ANGULAR SCOPE);
       var username_span = document.getElementById('username');
       var user_icon = document.getElementById('user_icon');
       var room_name = document.getElementById('room_name');
@@ -649,42 +611,32 @@
               '</div>'
           ).appendTo(messages_div);
       })
-
-      // Send RTC offer
       .on('send_offer', function(username) {
           print.operation('Sending RTC offer to %0...'.f(username.bold()));
       })
       .on('send_offer_error', function(username) {
           print,error('Failed to send RTC offer to %0.'.f(username.bold()));
       })
-
-      // Receive RTC offer
       .on ('receive_offer receive_answer', function(data) {
           print.success('Received RTC offer from %0.'.f(data.username.bold()));
       })
 
-
-      // Set Local Description for RTC
       .on('set_local_description', function(username) {
           print.success('Set local description for %0.'.f(username.bold()));
       })
       .on('set_local_description_error', function(username, error) {
           print.error('Failed to set local description for %0!'.f(username.bold()));
       })
-
-      // set Remote Description for RTC
       .on('set_remote_description', function(username) {
           print.success('Set remote description for %0.'.f(username.bold()));
       })
       .on('set_remote_description_error', function(username, error) {
           print,error('Failed to set remote description for %0!'.f(username.bold()));
       })
-
       .on('ice_candidate', function(username) {
           print.success('Received ICE Candidate for %0'.f(username.bold()));
       })
 
-      /* PeerConnection Events */
       .on('peer_connection_opened', function(username) {
           print.success('Peer connection opened for %0'.f(username.bold()));
       })
@@ -695,7 +647,6 @@
           print.error('PeerConnection error when coonecting with %0'.f(username.bold()));
       })
 
-      /* Data Stream Events */
       .on('create_data_channel', function(username) {
           print.operation('DataChannel starting for %0...'.f(username.bold()));
       })
@@ -731,7 +682,7 @@
               return;
           if (input[0] === '/') {
               var command = input.match(/\/(\w+) (.*)/);
-              command_lookup[command[1]](command[2]);
+                  command_lookup[command[1]](command[2]);
           } else {
               rtc.send(input);
           }
@@ -741,6 +692,8 @@
       window.rtc = rtc;
       rtc.connect(document.location.origin + '/stream');
   })()
+
+  // Log Service
   ;(function(rtc) {
 
       var pad0 = function(number) { return number < 10 ? '0' + number : number }
@@ -873,7 +826,7 @@
           log('failed to set username to ' + username);
       })
 
-  })(rtc);
-});
+    })(rtc);
+  });
 
 })(angular.module('MainCtrl', []));
