@@ -825,7 +825,7 @@
 })(angular.module('MainCtrl', []));
 
 (function(app) {
-    app.factory('Room', function ($rootScope, $q, $http) {
+    app.factory('Room', function ($http) {
         return {
             getRooms : function() {
               return $http.get('/get_rooms');
