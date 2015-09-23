@@ -28,7 +28,6 @@
 
         $scope.addPeer = function(stream, username) {
             var streamUrl = window.URL.createObjectURL(stream);
-            console.log('new stream from'+username+'uRL'+streamUrl);
             var peerId = stream.id;
             $scope.currentStream = stream.id;
             var newPeer = {
@@ -131,18 +130,18 @@
       var received_otr  = 2;
 
       var rtc = {
-          STUN_SERVERS: { // STUN/ICE server(s) to use for PeerConnections
+          STUN_SERVERS: {
               iceServers: [{ url: 'stun:stun.l.google.com:19302' } ]
           },
-          peerConnections: {}, // Reference to PeerConnection instance
+          peerConnections: {},
           dataChannels: {},
           connected: {},
           streams: [],
-          socket: null, // Web socket
+          socket: null,
           connected: false,
-          me: null, // ID f this connection
+          me: null,
           room: null,
-          _events: {}, // Event callbacks
+          _events: {},
           using_otr: false
       };
 
@@ -225,23 +224,18 @@
        * Creates a new peerConnection object for a given username.
        */
       rtc.create_peer_connection = function(username) {
+
           var config;
           if (rtc.dataChannelSupport != rtc_unsupported) {
               config = rtc.dataChannelConfig;
           }
-          /* create a new peer connection! */
           var pc = rtc.peerConnections[username] = new PeerConnection(rtc.STUN_SERVERS, config);
-
           rtc.fire('new_peer_connection', username, config);
 
           pc.onicecandidate = function(event) {
               if (event.candidate == null)
                   return
 
-              //TODO - does chrome want this only after onicecandidate ?? rtc.createDataChannel(username);
-              //if (!rtc.dataChannels[username]) {
-              //  rtc.createDataChannel(username);
-              //}
               rtc.emit('send_ice_candidate', {
                   label: event.candidate.label,
                   candidate: JSON.stringify(event.candidate),
@@ -249,8 +243,6 @@
               });
 
               rtc.fire('ice_candidate', username, event.candidate, event);
-
-              /* bloody hell chrome, we have to remove this handler as you send a ton of ice canidates & we only need one */
               pc.onicecandidate = null;
           };
 
@@ -275,6 +267,7 @@
           $(function(){
               currentStream = $scope.currentStream;
               pc.addStream(currentStream);
+              console.log(currentStream);
           })
 
           //if (rtc.dataChannelSupport != rtc_unsupported) {
@@ -437,14 +430,8 @@
       }
 
       rtc.send = function(message) {
-          var status = sent_all_otr;
-          // var otr_sent = 0;
           for (var x = 0; x < rtc.usernames.length; x++) {
               var username = rtc.usernames[x];
-              // if (rtc.crypto_verified[username]) {
-              //     rtc.send_otr_message(username, message);
-              //     otr_sent++;
-              // }
               if(rtc.dataChannels[username])
               rtc.dataChannels[username].send(message);
           }
@@ -497,11 +484,9 @@
 
       .on('get_peers', function(data) {
           var usernames = [];
-          /* we already sanitize everything later, but rather be safe than sorry */
           for (var i = 0, len = data.users.length; i < len; i++) {
               var user  = data.users[i];
               var username = user.username = user.username.sanitize();
-              // rtc.is_using_otr[username] = user.using_otr;
               usernames.push(username);
               rtc.create_peer_connection(username);
               rtc.create_data_channel(username);
@@ -509,11 +494,8 @@
           }
           rtc.usernames = usernames;
           rtc.users = data.users;
-
           rtc.first_connect = true
-
           rtc.fire('got_peers', data);
-
           rtc.first_connect = false;
       })
 
@@ -525,8 +507,6 @@
       .on('user_join', function(data) {
           rtc.usernames.push(data.username);
           rtc.create_peer_connection(data.username);
-          //rtc.create_data_channel(data.username);
-          //rtc.send_offer(data.username);
           var pc = rtc.create_peer_connection(data.username);
           for (var i = 0; i < rtc.streams.length; i++) {
               var stream = rtc.streams[i];
@@ -555,34 +535,21 @@
           rtc.receive_answer(data.username, data.sdp);
       })
 
-      .on('data_stream_data', function(username, data) {
-          // console.log(rtc.is_using_otr);
-          // if (rtc.is_using_otr[username]) {
-          //     rtc.receive_otr_message(username, data);
-          // } else {
-          //
-          // }
-      })
-      ;
-
       rtc.dataChannelConfig = {optional: [ {'DtlsSrtpKeyAgreement': true} ] };
 
       // Determine Data Channel support
       try {
-          /* first try reliable */
           var pc = new PeerConnection(rtc.STUN_SERVERS, rtc.dataChannelConfig);
           channel = pc.createDataChannel('supportCheck', { reliable: true });
           channel.close();
           rtc.dataChannelSupport = reliable_true;
       } catch(e) {
           try {
-              /* then unreliable */
               var pc = new PeerConnection(rtc.STUN_SERVERS, rtc.dataChannelConfig);
               channel = pc.createDataChannel('supportCheck', { reliable: false });
               channel.close();
               rtc.dataChannelSupport = reliable_false;
           } catch(e) {
-              /* then fail :( */
               rtc.dataChannelSupport = rtc_unsupported;
           }
       }
@@ -646,14 +613,6 @@
           print.error('Failed to set username: %0.'.f(data.error));
           buffer_input.value = '/nick ' + data.username;
       })
-
-      // .on('set_secret', function() {
-      //     $(user_icon).fadeOut(function() {
-      //         user_icon.setAttribute('class', 'fa ' +
-      //             (rtc.using_otr ? 'fa-user-secret' : 'fa-user'));
-      //         $(user_icon).fadeIn();
-      //     });
-      // })
 
       .on('joined_room', function() {
           $(room_icon).fadeOut(function() {
@@ -745,34 +704,7 @@
       })
       .on('data_stream_close', function(username, channel) {
           print.error('DataChannel closed for %0.'.f(username.bold()));
-      })
-
-      /* OTR */
-      .on('otr_init_begin', function() {
-          print.operation('Creating OTR key, this may freeze your browser and take a moment...');
-      })
-      .on('otr_init_done', function() {
-          print.success('OTR key created successfully.');
-      })
-      .on('go_otr_with', function(username) {
-          print.operation('Establishing secure connection to go OTR with %0...'.f(username.bold()));
-      })
-      .on('otr_with', function(username) {
-          print.success('OTR with %0, you may now safely communicate.'.f(username.bold()));
-      })
-      .on('failed_to_go_otr_with', function(username) {
-          print.error('Failed to go OTR with %0.'.f(username.bold()));
-      })
-      .on('otr_stream_error', function(username, error) {
-          print.error('OTR Stream error for %0: %1'.f(username.bold()));
-      })
-      .on('otr_failed', function(username, error) {
-          print.error('Failed to establish OTR channel with %0: %1.'.f(username.bold(), error));
-      })
-      .on('error_sending_not_otr', function() {
-          print.error('Message not sent because you have not gone OTR yet.');
-      })
-      ;
+      });
 
       var command_lookup = {
           connect: function(server) {
@@ -786,7 +718,6 @@
 
       buffer_input.addEventListener('keydown', function(event) {
 
-          // Only capture returns
           if (event.keyCode != 13)
               return;
           event.preventDefault();
@@ -922,11 +853,6 @@
       .on('data_channel_reliable', function() {
           log('Data channel reliability set to ')
       })
-
-      .on('set_secret', function() {
-          log('OTR is ' + (rtc.using_otr ? 'on' : 'off'));
-      })
-
       .on('get_peers', function(data) {
           log('get_peers', data);
 
@@ -935,7 +861,6 @@
       .on('joined_room', function(room) {
           log('joined room: ' + room);
       })
-
       .on('user_join', function(data) {
           log(data.username + ' has joined the room');
       })
@@ -948,10 +873,6 @@
           log('failed to set username to ' + username);
       })
 
-      .on('message', function(username, message, encrypted) {
-
-      })
-      ;
   })(rtc);
 });
 

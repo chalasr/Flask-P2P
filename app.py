@@ -231,20 +231,6 @@ def stream():
 def debug():
     return render_template('debug.html', rtc=rtc)
 
-@app.route('/otr_on', methods=['POST'])
-def on_otr_on():
-    print 'OTR on', request.webrtc_user
-    if request.webrtc_user and not request.webrtc_user.is_using_otr:
-        request.webrtc_user.is_using_otr = True
-    return jsonify(success=True)
-
-@app.route('/otr_off', methods=['POST'])
-def on_otr_off():
-    print 'OTR off', request.webrtc_user
-    if request.webrtc_user and request.webrtc_user.is_using_otr:
-        request.webrtc_user.is_using_otr = False
-    return jsonify(success=True)
-
 @app.route('/set_username', methods=['POST'])
 def on_set_name():
     print 'Set username', request.form
@@ -362,6 +348,10 @@ def on_send_answer():
         username=sender.username
     )
     return jsonify(success=True)
+
+@app.route('/get_rooms', methods=['GET'])
+def get_rooms(self):
+    return jsonify(self.rooms)
 
 
 if __name__ == '__main__':
