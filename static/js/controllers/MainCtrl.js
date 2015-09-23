@@ -17,39 +17,6 @@
              function(e){console.log(e);}
         );
 
-        $scope.getVideo = function(vidSrc) {
-          return $sce.trustAsResourceUrl(vidSrc);
-        };
-
-        $scope.addPeer = function(stream, username) {
-            var streamUrl = window.URL.createObjectURL(stream);
-            var peerId = stream.id;
-            $scope.currentStream = stream.id;
-            var newPeer = {
-                id: peerId,
-                username: username,
-                stream: streamUrl
-            };
-            var count = $scope.peers.filter(function(peer){
-               return (peer.username === newPeer.username)
-            });
-            if(count.length === 0) {
-                $scope.peers.push(newPeer);
-            }
-
-            $scope.$apply();
-        };
-
-        $scope.getRooms = function() {
-            Room.getRooms()
-              .success(function(data){
-                  $scope.rooms = data;
-              })
-              .error(function(data){
-                  console.log(data);
-              })
-        };
-
         /**
          * WebRTC Service
          * @return {Object} rtc
@@ -619,8 +586,46 @@
                 return false;
             });
 
+            $scope.getVideo = function(vidSrc) {
+              return $sce.trustAsResourceUrl(vidSrc);
+            };
+
+            $scope.addPeer = function(stream, username) {
+                var streamUrl = window.URL.createObjectURL(stream);
+                var peerId = stream.id;
+                $scope.currentStream = stream.id;
+                var newPeer = {
+                    id: peerId,
+                    username: username,
+                    stream: streamUrl
+                };
+                var count = $scope.peers.filter(function(peer){
+                   return (peer.username === newPeer.username)
+                });
+                if(count.length === 0) {
+                    $scope.peers.push(newPeer);
+                }
+
+                $scope.$apply();
+            };
+
+            $scope.getRooms = function() {
+                Room.getRooms()
+                  .success(function(data){
+                      $scope.rooms = data;
+                  })
+                  .error(function(data){
+                      console.log(data);
+                  })
+            };
+
+            $scope.joinRoom = function(room) {
+                rtc.join_room(room);
+            };
+
             window.rtc = rtc;
             rtc.connect(document.location.origin + '/stream');
+
             angular.element('#reloadRooms').click(function(event){
                 event.preventDefault();
                 $scope.getRooms();

@@ -32,12 +32,12 @@
                     </li>
                     <li class="dropdown"  ng-init="getRooms()">
                         <a href="" class="dropdown-toggle" data-toggle="dropdown">Rooms<b class="caret"></b></a>
-                        <ul class="dropdown-menu">
+                        <ul id="roomsMenu" class="dropdown-menu">
                             <ul class="column-dropdown" ng-repeat="room in rooms">
-                              <li><a href="#"><% room %></a></li>
+                              <li><a ng-click="joinRoom(room)"><% room %></a></li>
                             </ul>
                             <ul class="column-dropdown">
-                              <li><a href="" id="reloadRooms">Reload <i class="fa fa-refresh"></i></a></li>
+                              <li><a id="reloadRooms">Reload <i class="fa fa-refresh"></i></a></li>
                             </ul>
                         </ul>
                     </li>

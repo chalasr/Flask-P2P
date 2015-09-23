@@ -200,3 +200,7 @@ a {
 		max-height:100%;
 	}
 }
+
+#roomsMenu a:hover{
+    cursor:pointer;
+}
