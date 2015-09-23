@@ -21,6 +21,7 @@
                 document.getElementById('localVideo').src = window.URL.createObjectURL(stream);
                 console.log(stream, 'STREAMVIDEO');
                 $scope.currentStream = stream;
+                rtc.currentStream = stream;
              },
              function(e){console.log(e);}
         );
@@ -218,8 +219,7 @@
                 rtc.fire('new_peer_connection', username, config);
 
                 pc.onicecandidate = function(event) {
-                    if (event.candidate == null)
-                        return
+                    if (!event.candidate || event.candidate == null) return;
 
                     rtc.emit('send_ice_candidate', {
                         label: event.candidate.label,
@@ -245,21 +245,21 @@
                         can_close = true; /* TODO! - make per channel */
                     }
                     rtc.fire('ice_state_change', event);
-                }
+                };
 
                 $(function(){
-                    currentStream = $scope.currentStream;
-                    console.log(currentStream);
-                    pc.addStream(currentStream);
-                })
+                    console.log(rtc.currentStream);
+                    pc.addStream(rtc.currentStream);
+                });
 
                 pc.ondatachannel = function (event) {
                     rtc.add_data_channel(username, event.channel);
                     rtc.fire('add_data_channel', username, event);
-                }
+                };
+
                 pc.onidpassertionerror = pc.onidpvalidationerror = function(e) {
                     rtc.fire('pc_error', username, e)
-                }
+                };
                 return pc;
             }
 
