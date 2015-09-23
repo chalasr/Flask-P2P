@@ -9,12 +9,34 @@
 
   app.controller('MainController', function ($sce,$rootScope, $scope, $filter) {
         $scope.peers = [];
+        $scope.currentUser = angular.element('#username').text();
         $scope.roomUsers = [];
         $scope.currentRoom = '';
 
         $scope.getVideo = function(vidSrc) {
           return $sce.trustAsResourceUrl(vidSrc);
-        }
+        };
+
+        $scope.addPeer = function(stream) {
+            var streamUrl = window.URL.createObjectURL(stream);
+            var peerId = stream.id;
+            $scope.currentStream = stream.id;
+            var newPeer = {
+                id: peerId,
+                stream: streamUrl
+            };
+            if($scope.currentUser){
+              newPeer.username = username;
+            }
+            var count = $scope.peers.filter(function(peer){
+               return (peer.id === newPeer.id)
+            });
+            if(count.length === 0) {
+                $scope.peers.push(newPeer);
+            }
+            console.log($scope.peers);
+            $scope.$apply();
+        };
 
         ;(function() {
 
@@ -200,8 +222,18 @@
               }
               /* create a new peer connection! */
               var pc = rtc.peerConnections[username] = new PeerConnection(rtc.STUN_SERVERS, config);
-
               rtc.fire('new_peer_connection', username, config);
+
+              navigator.getUserMedia({"video": true, "audio": false},
+                  function(stream){
+                      document.getElementById('localVideo').src = window.URL.createObjectURL(stream);
+                        pc.onaddstream({stream: stream});
+                        pc.addStream(stream);
+                        $scope.addPeer(stream);
+                      console.log(stream, 'STREAMVIDEO');
+                   },
+                   function(e){console.log(e);}
+              );
 
               pc.onicecandidate = function(event) {
                   if (event.candidate == null)
@@ -331,6 +363,7 @@
            */
           rtc.create_data_channel = function(username, label) {
               var pc = rtc.peerConnections[username];
+              console.log(pc);
               var label = label || String(username); // need a label
               if (rtc.dataChannelSupport == reliable_false) {
                   return;
@@ -350,24 +383,6 @@
            * Adds callbacks to a dataChannel and stores the dataChannel.
            */
           rtc.add_data_channel = function(username, channel) {
-            navigator.getUserMedia(
-              {"video": true, "audio": false},
-              function(stream){
-                 var videoTracks = stream.getVideoTracks();
-                 var streamUrl = window.URL.createObjectURL(stream);
-                 document.querySelector('video').src = streamUrl;
-                 var peerId = stream.id;
-                 $scope.peers.push({
-                   id: peerId,
-                   username: username,
-                   stream: streamUrl
-                 });
-                 $rootScope.$apply();
-                 console.log($scope.peers);
-               },
-               function(e){console.log(e);
-              }
-             );
               channel.onopen = function() {
                   channel.binaryType = 'arraybuffer';
                   rtc.connected[username] = true;

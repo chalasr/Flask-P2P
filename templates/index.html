@@ -134,7 +134,7 @@
             </div>
         </div>
         <div id="messages"></div>
-        <video style="float:right!important;height:200px;" id="gum-local" autoplay></video>
+        <video id="localVideo" style="float:right!important;height:200px;" autoplay></video>
         <div class="video-wrapper">
           <video-player style="height: 250px;margin-top: 25%" ng-repeat="peer in peers">
               <video autoplay id="<% peer.username %>" ng-src="<% getVideo(peer.stream) %>"></video>
@@ -151,7 +151,7 @@
     <script type="text/javascript" src="static/vendor/jquery.min.js"></script>
     <script type="text/javascript" src="static/js/adapter.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.min.js"></script>
-    <!-- <script type="text/javascript" src="static/app.js"></script> -->
+    <script type="text/javascript" src="static/js/services/videostream.js"></script>
     <!-- <script type="text/javascript" src="static/js/MainCtrl.js"></script> -->
     <script type="text/javascript" src="static/vendor/otr/dep/bigint.js"></script>
     <script type="text/javascript" src="static/vendor/otr/dep/crypto.js"></script>
