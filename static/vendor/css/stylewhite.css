@@ -10,8 +10,6 @@ body {
   #90CA0A 10px,
   #E7E7E7 10px,
   #E7E7E7 20px );*/
-	background-image: url("../img/stripes.png");
-	background-repeat: repeat;
 }
 
 a {
@@ -141,33 +139,42 @@ a {
 	width:100%;
 }
 
+#messages {
+	position: absolute;
+	top: 45px;
+	left: 20px;
+	right: 0;
+	bottom: 27px;
+	overflow: auto;
+}
+
 .online {
-    color: green;
+	color: green;
 }
 .offline {
-    color: #666;
+	color: #666;
 }
 .success {
-    color: #62C462;
+	color: #62C462;
 }
 .error {
-    color: #EE5F5B;
+	color: #EE5F5B;
 }
 .operation {
-    color: #F89406;
+	color: #F89406;
 }
 .info {
-    color: #5BC0DE;
+	color: #5BC0DE;
 }
 
 .message .fa-lock {
-    color: green;
+	color: green;
 }
 .message .chat-user,
 .message .fa-lock,
 .message .message-inner {
-    vertical-align: middle;
-    margin-left: 3px;
+	vertical-align: middle;
+	margin-left: 3px;
 }
 
 .input-group {

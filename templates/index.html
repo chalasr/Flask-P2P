@@ -1,75 +1,83 @@
 <!DOCTYPE html>
 <html ng-app='app'>
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Pyhton">
 
     <title>Python</title>
-    <link rel="stylesheet" type="text/css" href="/static/vendor/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="/static/vendor/css/stylewhite.css" />
-    <link rel="stylesheet" type="text/css" href="/static/vendor/fontawesome/css/font-awesome.css"/>
-  </head>
+    <link rel="stylesheet" type="text/css" href="static/vendor/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="static/vendor/css/stylewhite.css" />
+    <link rel="stylesheet" type="text/css" href="static/vendor/fontawesome/css/font-awesome.css"/>
+</head>
 
-  <body ng-controller="MainController">
+<body ng-controller="MainController">
 
     <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="fa fa-plus fa-2x"></span>
-          </button>
-          <a class="navbar-brand" href="#">Python</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
+        <div class="container">
 
-            <li><a href="" id="username"><i class="fa fa-user"></i> Anonymous</a></li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Rooms<b class="caret"></b></a>
-              <ul class="dropdown-menu multi-column columns-2">
-                <div class="row">
-                  <div class="col-sm-6">
-                    <ul class="multi-column-dropdown">
-                      <li><a href="#">Breaks</a></li>
-                    </ul>
-                  </div>
-                </div>
-              </ul>
-            </li>
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="fa fa-plus fa-2x"></span>
+                </button>
+                <a class="navbar-brand" href="#">Python</a>
+            </div>
 
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-            <li class="">
-                <span id="connection_icon" class="fa fa-circle offline"></span>
-              <a href="" id="connection_status">Not Connected</a>
-            </li>
-          </ul>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a id="username"><i class="fa fa-user"></i> Anonymous</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="" class="dropdown-toggle" data-toggle="dropdown">Rooms<b class="caret"></b></a>
+                        <ul class="dropdown-menu multi-column columns-2">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <ul class="multi-column-dropdown">
+                                        <li><a href="#">Breaks</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <span id="room_icon" class="fa fa-street-view" style="display:none"></span>
+                        <a id="room_name">Lobby</a>
+                    </li>
+
+                    <li class="">
+                        <span id="connection_icon" class="fa fa-circle offline" style="display:none"></span>
+                        <a id="connection_status">Not Connected</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-      </div>
     </nav>
 
-    <div class="container">
+    <div id="messages">
 
     </div>
+    <video id="localVideo" style="float:right!important;height:200px;" autoplay></video>
 
-     <div id="messages"></div>
-        <video id="localVideo" style="float:right!important;height:200px;" autoplay></video>
-        <div class="video-wrapper">
-          <video-player style="height: 250px;margin-top: 25%" ng-repeat="peer in peers">
-              <video autoplay id="<% peer.username %>" ng-src="<% getVideo(peer.stream) %>"></video>
-          </video-player>
-        </div>
-        <div class="">
+    <div class="video-wrapper">
+        <video-player style="height: 250px;margin-top: 25%" ng-repeat="peer in peers">
+            <video autoplay id="<% peer.username %>" ng-src="<% getVideo(peer.stream) %>"></video>
+        </video-player>
+    </div>
+
+    <div class="">
+    </div>
+
     <div id="buffer">
-      <textarea id="buffer_input"></textarea>
+        <textarea class="form-control" id="buffer_input"></textarea>
     </div>
 
-    <script src="js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="static/vendor/bootstrap.min.js"></script>
     <script type="text/javascript" src="static/vendor/jquery.min.js"></script>
+    <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="static/js/adapter.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.min.js"></script>
     <script type="text/javascript" src="static/js/services/videostream.js"></script>
@@ -77,7 +85,6 @@
     <script type="text/javascript" src="static/vendor/otr/dep/crypto.js"></script>
     <script type="text/javascript" src="static/vendor/otr/dep/eventemitter.js"></script>
     <script type="text/javascript" src="static/vendor/otr/dep/salsa20.js"></script>
-
     <script type="text/javascript" src="static/js/chat.js"></script>
-  </body>
+</body>
 </html>
