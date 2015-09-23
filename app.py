@@ -364,5 +364,5 @@ def on_send_answer():
     return jsonify(success=True)
 
 
-if __name__ == '__main__':
-    app.run(threaded=True)
+# if __name__ == '__main__':
+#     app.run(threaded=True)

@@ -1,0 +1,63 @@
+[2015-09-23 11:17:00 +0200] [7012] [INFO] Starting gunicorn 19.3.0
+[2015-09-23 11:17:00 +0200] [7012] [INFO] Listening at: http://127.0.0.1:8000 (7012)
+[2015-09-23 11:17:00 +0200] [7012] [INFO] Using worker: sync
+[2015-09-23 11:17:00 +0200] [7015] [INFO] Booting worker with pid: 7015
+[2015-09-23 11:17:05 +0200] [7015] [ERROR] Error handling request
+Traceback (most recent call last):
+  File "/Users/Robin/Sites/EPITECH/PythonBahamas/venv/lib/python2.7/site-packages/gunicorn/workers/sync.py", line 130, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/Users/Robin/Sites/EPITECH/PythonBahamas/venv/lib/python2.7/site-packages/gunicorn/workers/sync.py", line 171, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+TypeError: index() takes no arguments (2 given)
+[2015-09-23 11:17:06 +0200] [7015] [ERROR] Error handling request
+Traceback (most recent call last):
+  File "/Users/Robin/Sites/EPITECH/PythonBahamas/venv/lib/python2.7/site-packages/gunicorn/workers/sync.py", line 130, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/Users/Robin/Sites/EPITECH/PythonBahamas/venv/lib/python2.7/site-packages/gunicorn/workers/sync.py", line 171, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+TypeError: index() takes no arguments (2 given)
+[2015-09-23 11:17:06 +0200] [7015] [ERROR] Error handling request
+Traceback (most recent call last):
+  File "/Users/Robin/Sites/EPITECH/PythonBahamas/venv/lib/python2.7/site-packages/gunicorn/workers/sync.py", line 130, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/Users/Robin/Sites/EPITECH/PythonBahamas/venv/lib/python2.7/site-packages/gunicorn/workers/sync.py", line 171, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+TypeError: index() takes no arguments (2 given)
+[2015-09-23 11:17:06 +0200] [7015] [ERROR] Error handling request
+Traceback (most recent call last):
+  File "/Users/Robin/Sites/EPITECH/PythonBahamas/venv/lib/python2.7/site-packages/gunicorn/workers/sync.py", line 130, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/Users/Robin/Sites/EPITECH/PythonBahamas/venv/lib/python2.7/site-packages/gunicorn/workers/sync.py", line 171, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+TypeError: index() takes no arguments (2 given)
+[2015-09-23 11:17:06 +0200] [7015] [ERROR] Error handling request
+Traceback (most recent call last):
+  File "/Users/Robin/Sites/EPITECH/PythonBahamas/venv/lib/python2.7/site-packages/gunicorn/workers/sync.py", line 130, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/Users/Robin/Sites/EPITECH/PythonBahamas/venv/lib/python2.7/site-packages/gunicorn/workers/sync.py", line 171, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+TypeError: index() takes no arguments (2 given)
+[2015-09-23 11:17:07 +0200] [7015] [ERROR] Error handling request
+Traceback (most recent call last):
+  File "/Users/Robin/Sites/EPITECH/PythonBahamas/venv/lib/python2.7/site-packages/gunicorn/workers/sync.py", line 130, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/Users/Robin/Sites/EPITECH/PythonBahamas/venv/lib/python2.7/site-packages/gunicorn/workers/sync.py", line 171, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+TypeError: index() takes no arguments (2 given)
+[2015-09-23 11:17:07 +0200] [7015] [ERROR] Error handling request
+Traceback (most recent call last):
+  File "/Users/Robin/Sites/EPITECH/PythonBahamas/venv/lib/python2.7/site-packages/gunicorn/workers/sync.py", line 130, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/Users/Robin/Sites/EPITECH/PythonBahamas/venv/lib/python2.7/site-packages/gunicorn/workers/sync.py", line 171, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+TypeError: index() takes no arguments (2 given)
+[2015-09-23 11:17:07 +0200] [7015] [ERROR] Error handling request
+Traceback (most recent call last):
+  File "/Users/Robin/Sites/EPITECH/PythonBahamas/venv/lib/python2.7/site-packages/gunicorn/workers/sync.py", line 130, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/Users/Robin/Sites/EPITECH/PythonBahamas/venv/lib/python2.7/site-packages/gunicorn/workers/sync.py", line 171, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+TypeError: index() takes no arguments (2 given)
+[2015-09-23 11:19:20 +0200] [7012] [INFO] Handling signal: int
+[2015-09-23 11:19:20 +0200] [7015] [INFO] Worker exiting (pid: 7015)
+[2015-09-23 11:19:20 +0200] [7012] [INFO] Shutting down: Master
