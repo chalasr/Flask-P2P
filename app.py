@@ -164,7 +164,6 @@ class WebRTC(object):
 
 rtc = WebRTC()
 
-
 def event_stream(stream_id):
     """SSE stream handler for clients"""
     connected = True

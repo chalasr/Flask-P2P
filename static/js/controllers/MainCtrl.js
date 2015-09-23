@@ -1,6 +1,9 @@
 (function(app) {
     app.controller('MainController', function ($sce, $rootScope, $scope, $filter, Room) {
 
+      // TODO Check if user is in room before join room, if he is, return;
+
+
         $scope.peers = [];
         $scope.currentUser = ''
         $scope.roomUsers = [];
@@ -10,9 +13,7 @@
         navigator.getUserMedia({"video": true, "audio": false},
             function(stream){
                 document.getElementById('localVideo').src = window.URL.createObjectURL(stream);
-                console.log(stream, 'STREAMVIDEO');
                 $scope.currentStream = stream;
-                rtc.currentStream = stream;
              },
              function(e){console.log(e);}
         );
@@ -69,11 +70,6 @@
             var rtc_unsupported = 0;
             var reliable_false  = 1;
             var reliable_true   = 2;
-            var sent_no_otr   = 0;
-            var sent_some_otr = 1;
-            var sent_all_otr  = 2;
-            var received      = 0;
-            var received_otr  = 2;
             var rtc = {
                 STUN_SERVERS: {
                     iceServers: [{ url: 'stun:stun.l.google.com:19302' } ]
@@ -90,9 +86,6 @@
                 using_otr: false
             };
 
-            /*
-             * Set callback(s) for space-deliminated event string.
-             */
             rtc.on = function(event, callback) {
                 var events = event.split(' ');
                 for (var x = 0; x < events.length; x++) {
@@ -104,9 +97,6 @@
                 return this;
             }
 
-            /*
-             * Fire callback(s) for space-deliminated event string.
-             */
             rtc.fire = function(event/* ... args */) {
                 var events = event.split(' ');
                 var args = Array.prototype.slice.call(arguments, 1);
@@ -119,9 +109,6 @@
                 return this;
             }
 
-            /*
-             * Connects to the SSE source.
-             */
             rtc.connect = function(stream_url) {
 
                 rtc.stream = new EventSource(stream_url);
@@ -150,9 +137,6 @@
                 }
             }
 
-            /*
-             * Emit a request (event) to the server.
-             */
             rtc.emit = function(event, data) {
                 var type = typeof data === 'string' ? data : 'post';
                 return $.ajax({
@@ -164,9 +148,6 @@
                 });
             }
 
-            /*
-             * Creates a new peerConnection object for a given username.
-             */
             rtc.create_peer_connection = function(username) {
 
                 var config;
@@ -206,8 +187,7 @@
                 };
 
                 $(function(){
-                    console.log(rtc.currentStream);
-                    pc.addStream(rtc.currentStream);
+                    pc.addStream($scope.currentStream);
                 });
 
                 pc.ondatachannel = function (event) {
@@ -221,9 +201,6 @@
                 return pc;
             }
 
-            /*
-             * Send intial WebRTC peerConnection offer.
-             */
             rtc.send_offer = function(username) {
                 var pc = rtc.peerConnections[username];
                 pc.createOffer( function(session_description) {
@@ -243,9 +220,6 @@
                 });
             }
 
-            /*
-             * Receive intial WebRTC peerConnection offer.
-             */
             rtc.receive_offer = function(username, sdp) {
                 var pc = rtc.peerConnections[username];
                 var sdp_reply = new SessionDescription(JSON.parse(sdp));
@@ -257,9 +231,6 @@
                 });
             }
 
-            /*
-             * Send WebRTC peerConnection answer back to user who sent offer.
-             */
             rtc.send_answer = function(username) {
                 var pc = rtc.peerConnections[username];
 
@@ -279,9 +250,6 @@
                 });
             }
 
-            /*
-             * The user who sent original WebRTC offer receives final answer.
-             */
             rtc.receive_answer = function(username, sdp_in) {
                 var pc = rtc.peerConnections[username];
                 var sdp = new SessionDescription(JSON.parse(sdp_in));
@@ -292,9 +260,6 @@
                 });
             }
 
-            /*
-             * Creates a dataChannel instance for a peer.
-             */
             rtc.create_data_channel = function(username, label) {
                 var pc = rtc.peerConnections[username];
                 var label = label || String(username);
@@ -310,9 +275,6 @@
                 return rtc.add_data_channel(username, channel);
             };
 
-            /*
-             * Adds callbacks to a dataChannel and stores the dataChannel.
-             */
             rtc.add_data_channel = function(username, channel) {
                 channel.onopen = function() {
                     channel.binaryType = 'arraybuffer';
@@ -358,7 +320,7 @@
                     if(rtc.dataChannels[username])
                     rtc.dataChannels[username].send(message);
                 }
-                rtc.fire('message', rtc.username, message.sanitize(), sent_all_otr);
+                rtc.fire('message', rtc.username, message.sanitize());
             }
 
             rtc.join_room = function(room) {
@@ -521,6 +483,10 @@
                 print.success('Username successfully set to %0.'.f(rtc.username.bold()));
                 username_span.innerHTML = rtc.username;
             })
+            .on ('user_leave', function() {
+                print.success('User has leave room');
+                username_span.innerHTML = rtc.username;
+            })
             .on ('set_username_error', function(data) {
                 print.error('Failed to set username: %0.'.f(data.error));
                 buffer_input.value = '/nick ' + data.username;
@@ -544,7 +510,7 @@
             .on('user_join', function(data) {
                 print.info('User %0 has joined.'.f(data.username.bold()));
             })
-            .on('message', function(username, message, otr_status) {
+            .on('message', function(username, message) {
                 var $message = $(
                     '<div class="message">' +
                         '<span class="fa fa-lock"></span>' +
@@ -593,7 +559,6 @@
             $scope.addPeer = function(stream, username) {
                 var streamUrl = window.URL.createObjectURL(stream);
                 var peerId = stream.id;
-                $scope.currentStream = stream.id;
                 var newPeer = {
                     id: peerId,
                     username: username,
