@@ -29,17 +29,17 @@ def jsonify(*args, **kwargs):
     mime = kwargs.pop('_mime', 'application/json')
     # Check for an argument passed, otherwise dict() the kwargs
     data = args[0] if args else dict(kwargs)
-    
+
     # Format pretty print if enabled
     if app.config['JSONIFY_PRETTYPRINT_REGULAR'] \
        and not request.is_xhr:
         indent = 2
-        
+
     # Send JSON response
     dump = json.dumps(data, indent=indent)
     return app.response_class(dump, status=status, mimetype=mime)
 
-    
+
 
 # Override Flask's json encoder to check for to_JSON method on objects
 app.json_encoder = ExtensibleJSONEncoder
@@ -152,7 +152,7 @@ class WebRTC(object):
     def get_current_user(self):
         if request.stream_id and self.users_by_stream[request.stream_id]:
             return self.users_by_stream[request.stream_id]
-          
+
         return None
 
     def disconnected(self, stream_id):
@@ -224,7 +224,7 @@ def stream():
     stream_id = uuid.uuid4().get_hex()
     rtc.users[stream_id] = WebRTCUser(stream_id)
     rtc.users_by_stream[stream_id] = rtc.users[stream_id]
-    return Response(stream_with_context(event_stream(stream_id)), 
+    return Response(stream_with_context(event_stream(stream_id)),
         mimetype="text/event-stream")
 
 @app.route('/debug')
@@ -235,7 +235,7 @@ def debug():
 def on_otr_on():
     print 'OTR on', request.webrtc_user
     if request.webrtc_user and not request.webrtc_user.is_using_otr:
-        request.webrtc_user.is_using_otr = True 
+        request.webrtc_user.is_using_otr = True
     return jsonify(success=True)
 
 @app.route('/otr_off', methods=['POST'])
@@ -266,9 +266,9 @@ def on_set_name():
     user = rtc.get_current_user()
 
     if not user:
-        return jsonify(error="Missing or invalid X-Stream-ID header", 
+        return jsonify(error="Missing or invalid X-Stream-ID header",
             _status=400)
-    
+
     old_username = user.username
     if old_username:
         rtc.users_by_username[old_username] = None
@@ -283,7 +283,7 @@ def on_set_name():
     return jsonify(success=True)
 
 @app.route('/join_room', methods=['POST'])
-def on_join_room():
+def on_`join`_room():
     """Join a webRTC room"""
     print 'join_room', request.form
     # TODO: room name validation
@@ -312,7 +312,7 @@ def on_leave_room():
     username = request.form['username']
     room = request.form['room']
     leave_room(room)
-   
+
 @app.route('/room_info', methods=['POST'])
 def on_room_info():
     print 'room_info', request.form
@@ -323,7 +323,7 @@ def on_room_info():
         encryption = rtc.encryption[room]
         browser = rtc.browser[room]
         browser_version = rtc.browser_version[room]
-    user.emit('receive_room_info', 
+    user.emit('receive_room_info',
         encryption=encryption,
         browser=browser,
         browser_version=browser_version
@@ -335,7 +335,7 @@ def on_send_ice_candidate():
     print 'send_ice_candidate', request.form
     sender = rtc.get_current_user()
     user = rtc.users_by_username[request.form['username']]
-    user.emit('receive_ice_candidate', 
+    user.emit('receive_ice_candidate',
         candidate=request.form['candidate'],
         username=sender.username
     )
@@ -346,7 +346,7 @@ def on_send_offer():
     print 'send_offer', request.form
     sender = rtc.get_current_user()
     user = rtc.users_by_username[request.form['username']]
-    user.emit('receive_offer', 
+    user.emit('receive_offer',
         sdp=request.form['sdp'],
         username=sender.username
     )
@@ -357,12 +357,12 @@ def on_send_answer():
     print 'send_answer', request.form
     sender = rtc.get_current_user()
     user = rtc.users_by_username[request.form['username']]
-    user.emit('receive_answer', 
+    user.emit('receive_answer',
         sdp=request.form['sdp'],
         username=sender.username
     )
     return jsonify(success=True)
 
 
-if __name__ == '__main__':
-    app.run(threaded=True)
+# if __name__ == '__main__':
+#     app.run(threaded=True)
