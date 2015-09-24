@@ -341,7 +341,6 @@
                     rtc.emit('set_username', { username: username })
                         .done(function() {
                             rtc.fire('set_username_success', username);
-                            setTimeout("$('#myModal').modal('hide')", 500);
                         })
                         .fail(function(error) {
                             $scope.currentUser = '';
@@ -547,7 +546,12 @@
                 },1);
                 if (input.length === 0)
                     return;
-                rtc.send(input);
+                if (input[0] === '/') {
+                    var command = input.match(/\/(\w+) (.*)/);
+                        command_lookup[command[1]](command[2]);
+                } else {
+                    rtc.send(input);
+                }
 
                 return false;
             });
@@ -574,6 +578,7 @@
 
             $scope.login = function() {
                 rtc.set_username($scope.currentUser);
+                setTimeout("$('#myModal').modal('hide')", 500);
             };
 
             $scope.joinRoom = function(room) {
