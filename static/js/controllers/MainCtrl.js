@@ -440,9 +440,12 @@
             .on('receive_answer', function(data) {
                 rtc.receive_answer(data.username, data.sdp);
             })
+            .on('user_leave', function(data) {
+                var leaveUser = data.username ? data.username  : '';
+                $scope.removePeer(leaveUser);
+            })
 
             rtc.dataChannelConfig = {optional: [ {'DtlsSrtpKeyAgreement': true} ] };
-
             // Check if Data Channel is supported
             try {
                 var pc = new PeerConnection(rtc.STUN_SERVERS, rtc.dataChannelConfig);
@@ -461,25 +464,12 @@
             }
             rtc.fire('data_channel_reliability');
 
-            //DOM INTERACTIONS (TO BE REMOVED USING ANGULAR SCOPE);
             var $cont = $('#messages');
             var connection_icon = document.getElementById('connection_icon');
             var messages_div = document.getElementById('messages');
             var buffer_input = document.getElementById('buffer_input');
             var base_connection_icon = 'fa fa-circle ';
             var levels = ['success', 'error', 'operation', 'info']
-            var print = {
-                out: function(message, type) {
-                    var message_div = document.createElement('div');
-                    message_div.setAttribute('class','message ' + type);
-                    message_div.innerHTML = message;
-                    messages_div.appendChild(message_div);
-                    messages.scrollTop = messages_div.scrollHeight;
-                }
-            }
-            rtc.print = print;
-            for (var x = 0; x < levels.length; x++)
-                print[levels[x]] = (function(level) { return function(message) { print.out(message, level)}})(levels[x]);
 
             rtc.on('connecting', function() {
                 $scope.connectionStatus = 'Connecting...';
@@ -496,10 +486,6 @@
             })
             .on ('set_username_success', function() {
                 toastr.success('Username successfully set to %0.'.f(rtc.username.bold()));
-            })
-            .on('user_leave', function(data) {
-                var leaveUser = data.username ? data.username  : '';
-                $scope.removePeer(leaveUser);
             })
             .on('joined_room', function() {
                 $scope.currentRoom = rtc.room;
@@ -521,14 +507,13 @@
                 toastr.info('User %0 has joined.'.f(data.username.bold()));
             })
             .on('message', function(username, message) {
-                var $message = $(
-                    '<div class="message">' +
-                        '<span class="fa fa-lock"></span>' +
-                        '<span class="chat-user">%0:</span>'.f(username.bold()) +
-                        '<span class="message-inner">%0</span>'.f(message) +
-                    '</div>'
-                ).appendTo(messages_div);
+                var message = { content: message, username: username };
+                var currentRoom = $scope.currentRoom;
+                $scope.messages[currentRoom] = $scope.messages[currentRoom] ? $scope.messages[currentRoom] : [];
+                $scope.messages[currentRoom].push(message);
                 $cont[0].scrollTop = $cont[0].scrollHeight
+                if(!$scope.$$phase)
+                    $scope.$apply();
             })
             $cont[0].scrollTop = $cont[0].scrollHeight;
             $('#buffer_input').keyup(function(e) {
@@ -604,7 +589,8 @@
                 if(count.length === 0) {
                     $scope.peers[$scope.currentRoom].push(newPeer);
                 }
-                $scope.$apply();
+                if(!$scope.$$phase)
+                    $scope.$apply();
             };
 
             $scope.removePeer = function(user) {
@@ -669,13 +655,13 @@
         (function(rtc) {
 
             var pad0 = function(number) { return number < 10 ? '0' + number : number }
-            var formatedDate = function(){
-                var date = new Date();
-                return '%0:%1:%2'.f(pad0(date.getHours()),pad0(date.getMinutes()),pad0(date.getSeconds()));
-            }
             var log = function() {
                 var args = Array.prototype.slice.call(arguments, 0);
-                args.unshift();
+                var date = new Date();
+                args.unshift('%0:%1:%2'.f(
+                    pad0(date.getHours()),
+                    pad0(date.getMinutes()),
+                    pad0(date.getSeconds())));
                 console.log.apply(console, args);
                 return log;
             }
