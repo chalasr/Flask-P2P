@@ -2,28 +2,26 @@
     app.controller('MainController', function ($sce, $rootScope, $scope, $filter, Room) {
 
       // TODO Check if user is in room before join room, if he is, return;
+      // TODO ON USER LEAVE, REMOVE IT FROM PEERS
 
-
-        $scope.peers = [];
-        $scope.currentUser = ''
-        $scope.roomUsers = [];
-        $scope.rooms = [];
-        $scope.currentRoom = '';
+        $scope.peers = [], $scope.roomUsers = [], $scope.rooms = []
+        $scope.currentUser = '', $scope.currentRoom = '';
 
         navigator.getUserMedia({"video": true, "audio": false},
             function(stream){
                 document.getElementById('localVideo').src = window.URL.createObjectURL(stream);
                 $scope.currentStream = stream;
+                $scope.getLoginForm();
              },
              function(e){console.log(e);}
         );
 
         /**
          * WebRTC Service
-         * @return {Object} rtc
+         * @return {Object} RTC
          */
-        ;(function() {
-            ;(function(strings, regex) {
+        (function() {
+            (function(strings, regex) {
                 //Parse string
                 strings.f = function () {
                     var args = arguments;
@@ -343,8 +341,11 @@
                     rtc.emit('set_username', { username: username })
                         .done(function() {
                             rtc.fire('set_username_success', username);
+                            setTimeout("$('#myModal').modal('hide')", 500);
                         })
                         .fail(function(error) {
+                            $scope.currentUser = '';
+                            toastr.error('Nom d\'utilisateur déjà pris')
                             rtc.fire('set_username_error', username, error)
                         })
                     ;
@@ -446,7 +447,6 @@
             //DOM INTERACTIONS (TO BE REMOVED USING ANGULAR SCOPE);
             var username_span = document.getElementById('username');
             var user_icon = document.getElementById('user_icon');
-            var room_name = document.getElementById('room_name');
             var room_icon = document.getElementById('room_icon');
             var connection_status_div = document.getElementById('connection_status');
             var connection_icon = document.getElementById('connection_icon');
@@ -489,12 +489,8 @@
                 print.success('User has leave room');
                 username_span.innerHTML = rtc.username;
             })
-            .on ('set_username_error', function(data) {
-                print.error('Failed to set username: %0.'.f(data.error));
-                buffer_input.value = '/nick ' + data.username;
-            })
             .on('joined_room', function() {
-                $(room_name).html(rtc.room);
+                $scope.currentRoom = rtc.room;
             })
             .on ('got_peers', function(data) {
                 if (rtc.first_connect)
@@ -522,6 +518,13 @@
                 ).appendTo(messages_div);
             })
 
+            var $cont = $('#messages');
+            $cont[0].scrollTop = $cont[0].scrollHeight;
+            $('#buffer_input').keyup(function(e) {
+                if (e.keyCode == 13)
+                    $cont[0].scrollTop = $cont[0].scrollHeight
+            });
+
             var command_lookup = {
                 connect: function(server) {
                     if (!/^(http:\/\/|https:\/\/)/.test(server))
@@ -533,7 +536,6 @@
             }
 
             buffer_input.addEventListener('keydown', function(event) {
-
                 if (event.keyCode != 13)
                     return;
                 event.preventDefault();
@@ -545,17 +547,37 @@
                 },1);
                 if (input.length === 0)
                     return;
-                if (input[0] === '/') {
-                    var command = input.match(/\/(\w+) (.*)/);
-                        command_lookup[command[1]](command[2]);
-                } else {
-                    rtc.send(input);
-                }
+                rtc.send(input);
+
+                return false;
+            });
+
+            angular.element('#reloadRooms').click(function(event) {
+                event.preventDefault();
+                $scope.getRooms();
+                return false;
+            });
+
+            angular.element('#reloadUsers').click(function(event) {
+                event.preventDefault();
+                $scope.getUsers($scope.currentRoom);
                 return false;
             });
 
             $scope.getVideo = function(vidSrc) {
-              return $sce.trustAsResourceUrl(vidSrc);
+                return $sce.trustAsResourceUrl(vidSrc);
+            };
+
+            $scope.getLoginForm = function(){
+                setTimeout("$('#myModal').modal()", 500);
+            };
+
+            $scope.login = function() {
+                rtc.set_username($scope.currentUser);
+            };
+
+            $scope.joinRoom = function(room) {
+                rtc.join_room(room);
             };
 
             $scope.addPeer = function(stream, username) {
@@ -586,36 +608,20 @@
                   })
             };
 
-            $scope.getUsers = function(){
-              if($scope.currentRoom != ""){
-                  Room.getUsers($scope.currentRoom)
-                    .success(function(data){
+            $scope.getUsers = function() {
+              if($scope.currentRoom == "")
+                  return;
+              Room.getUsers($scope.currentRoom)
+                  .success(function(data) {
                       $scope.users = data;
-                    })
-                    .error(function(data){
+                  })
+                  .error(function(data) {
                       console.log(data);
-                    })
-                }
-            };
-
-            $scope.joinRoom = function(room) {
-                rtc.join_room(room);
+                  })
             };
 
             window.rtc = rtc;
             rtc.connect(document.location.origin + '/stream');
-
-            angular.element('#reloadRooms').click(function(event){
-                event.preventDefault();
-                $scope.getRooms();
-                return false;
-            });
-
-            angular.element('#reloadUsers').click(function(event){
-              event.preventDefault();
-              $scope.getUsers($scope.currentRoom);
-              return false;
-            });
 
         })();
 
