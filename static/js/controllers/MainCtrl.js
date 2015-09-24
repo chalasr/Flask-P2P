@@ -326,6 +326,7 @@
             rtc.join_room = function(room) {
                 rtc.room = room;
                 $scope.currentRoom = room;
+                $scope.getUsers(room);
                 if (rtc.connected)
                     rtc.emit('join_room', { room: room, encryption: null })
                         .done(function(json) {

@@ -182,6 +182,11 @@ a {
 	padding-top:2px;
 	height:30px;
 }
+
+#messages{
+  height:450px;
+  overflow: auto;
+}
 @media (max-width: 767px) {
 	.dropdown-menu.multi-column {
 		min-width: 240px !important;
