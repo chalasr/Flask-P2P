@@ -29,9 +29,10 @@
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>
-                        <a id="username"><i class="fa fa-user"></i> Anonymous</a>
+                        <a ng-if="currentUser == ''" id="username">Anonymous</a>
+                        <a ng-if="currentUser != ''" id="username"><% currentUser %></a>
                     </li>
-                    <li class="dropdown" ng-init="getRooms()">
+                    <li class="dropdown" ng-init="getRooms()" ng-click="getRooms()">
                         <a href="" class="dropdown-toggle" data-toggle="dropdown">Rooms<b class="caret"></b></a>
                         <ul id="roomsMenu" class="dropdown-menu">
                             <ul class="column-dropdown" ng-repeat="room in rooms">
@@ -66,7 +67,7 @@
 
                     <li class="">
                         <span id="connection_icon" class="fa fa-circle offline" style="display:none"></span>
-                        <a id="connection_status">Not Connected</a>
+                        <a id="connection_status"><% connectionStatus %></a>
                     </li>
                 </ul>
             </div>

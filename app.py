@@ -15,7 +15,6 @@ app.debug = True
 heartbeat_interval = 10 # seconds
 
 class ExtensibleJSONEncoder(json.JSONEncoder):
-    """A JSON encoder that will check for a .__json__ method on objects."""
     def default(self, obj):
         if hasattr(obj, 'to_JSON'):
             return obj.to_JSON()
@@ -23,19 +22,15 @@ class ExtensibleJSONEncoder(json.JSONEncoder):
 
 
 def jsonify(*args, **kwargs):
-    """Improved json response factory"""
     indent = None
     status = kwargs.pop('_status', 200)
     mime = kwargs.pop('_mime', 'application/json')
-    # Check for an argument passed, otherwise dict() the kwargs
     data = args[0] if args else dict(kwargs)
 
-    # Format pretty print if enabled
     if app.config['JSONIFY_PRETTYPRINT_REGULAR'] \
        and not request.is_xhr:
         indent = 2
 
-    # Send JSON response
     dump = json.dumps(data, indent=indent)
     return app.response_class(dump, status=status, mimetype=mime)
 
@@ -49,7 +44,6 @@ class WebRTCUser(object):
     username = None
     connected_at = None
     namespace = None
-    is_using_otr = False
 
     def __init__(self, id, username=None):
         self.id = id
@@ -178,7 +172,6 @@ def event_stream(stream_id):
         return
 
     while connected:
-        #print 'Waiting for a message to send to %s' % stream_id
         message = user.messages.get(block=True, timeout=None)
         if message != '{"event": "heartbeat"}':
             print 'Sending %s to %s' % (message, stream_id)
@@ -200,6 +193,8 @@ def heartbeat(delay):
         time.sleep(delay)
 thread.start_new_thread(heartbeat, (heartbeat_interval,))
 
+## API
+
 @app.before_request
 def before_request():
     stream_id = None
@@ -210,8 +205,6 @@ def before_request():
             user = rtc.users[stream_id]
     setattr(request, 'stream_id', stream_id)
     setattr(request, 'webrtc_user', user)
-
-
 
 @app.route('/')
 def index():
@@ -286,7 +279,6 @@ def on_join_room():
         if patron.id != user.id:
             data['users'].append(dict(
                 username=patron.username,
-                using_otr=patron.is_using_otr
             ))
 
     return jsonify(data)
@@ -362,8 +354,6 @@ def get_users_in_room(room):
     for user in room.users:
         get_users_in_room.insert(0, user.username)
     return jsonify(get_users_in_room)
-
-
 
 
 if __name__ == '__main__':
