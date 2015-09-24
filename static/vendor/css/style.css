@@ -204,6 +204,7 @@ a {
   height:450px;
   overflow: auto;
 }
+
 @media (max-width: 767px) {
 	.dropdown-menu.multi-column {
 		min-width: 240px !important;
