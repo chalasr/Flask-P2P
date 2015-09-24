@@ -573,7 +573,7 @@
             };
 
             $scope.getLoginForm = function(){
-                setTimeout("$('#myModal').modal()", 500);
+                setTimeout("$('#myModal').modal({ backdrop: 'static'})", 500);
             };
 
             $scope.login = function() {
