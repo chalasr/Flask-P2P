@@ -87,7 +87,7 @@
         </div>
 
         <div class="col-md-6 video-wrapper">
-          <video id="localVideo" style="float:right;max-width:50%;" autoplay></video>
+          <video id="localVideo" style="float:right;max-width:50%;border: solid 3px #90CA0A;" autoplay></video>
             <video-player ng-repeat="peer in peers">
                 <video autoplay style="float:right;max-width:50%;" id="<% peer.username %>" ng-src="<% getVideo(peer.stream) %>"></video>
             </video-player>

@@ -6,12 +6,16 @@
 
         $scope.peers = [], $scope.roomUsers = [], $scope.rooms = []
         $scope.currentUser = '', $scope.currentRoom = '';
+        var sound = new Audio(document.location.origin + '/static/vendor/Sound.wav');
+        var soundtwo = new Audio(document.location.origin + '/static/vendor/Sound2.wav');
 
-        navigator.getUserMedia({"video": true, "audio": false},
+
+        navigator.getUserMedia({"video": true, "audio": true},
             function(stream){
                 document.getElementById('localVideo').src = window.URL.createObjectURL(stream);
                 $scope.currentStream = stream;
                 $scope.getLoginForm();
+                sound.play();
              },
              function(e){console.log(e);}
         );
@@ -288,6 +292,8 @@
                 channel.onmessage = function(message) {
                     rtc.fire('data_stream_data', username, message);
                     rtc.fire('message', username, message.data);
+                    console.log(username);
+                    console.log($scope.currentUser);
                 };
 
                 channel.onerror = function(error) {
@@ -330,6 +336,7 @@
                         .done(function(json) {
                             rtc.fire('joined_room', room)
                                .fire('get_peers', json);
+                               sound.play();
                                $scope.getRooms();
                         })
                 ;
