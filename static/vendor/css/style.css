@@ -93,26 +93,6 @@ a {
 	font-family:"Raleway";
 }
 
-#searchbar {
-	height:40px;
-	width: 85%;
-	float: left;
-	text-transform: uppercase;
-	margin-bottom:6px;
-}
-
-#searchbtn {
-	width: 15%;
-	float: left;
-	height:40px;
-	box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 8px rgba(44, 179, 30, 0.6);
-	color:#90CA0A;
-}
-
-#searchbtn  span {
-	color:#90CA0A!important;
-}
-
 .online {
 	color: green;
 }
@@ -164,7 +144,7 @@ a {
 	padding-left:10px;
 }
 
-.column-dropdown li a {
+.column-dropdown a {
 	display: block;
 	clear: both;
 	line-height: 1.428571429;
@@ -172,15 +152,52 @@ a {
 	white-space: normal;
 }
 
-.column-dropdown li a:hover {
+.column-dropdown a:hover {
 	text-decoration: none;
 	color: #262626;
+}
+.form-control:focus {
+-webkit-box-shadow: none!important;
+    -moz-box-shadow: none!important;
+    box-shadow: none!important;
+    border-color:#62C462!important;
 }
 
 .navbar-toggle{
 	width:50px;
 	padding-top:2px;
 	height:30px;
+}
+.createroom{
+  margin-top: 7px;
+}
+
+.search{
+	margin-top: 5px;
+	margin-left: 5px;
+}
+
+.searchbar {
+	height:30px;
+	width: 80%;
+	float: left;
+	color:#777;
+  margin-top:3px;
+}
+
+.searchbtn {
+	width: 20%;
+	float: left;
+	height:30px;
+  margin-top:3px;
+}
+
+.searchbtn span {
+	color:#90CA0A;
+}
+.searchcontainer {
+	width: 85%;
+	float: left;
 }
 
 #messages{

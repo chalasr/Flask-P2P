@@ -568,6 +568,20 @@
                 return false;
             });
 
+            $('#createRoom').keydown(function(event){
+                var room = $(this).val();
+                if(event.keyCode == 13){
+                  $scope.joinRoom(room);
+                }
+
+            });
+
+            $('#submitRoom').click(function(event){
+                var room = $('#createRoom').val();
+                console.log(room);
+                $scope.joinRoom(room);
+            });
+
             $scope.getVideo = function(vidSrc) {
                 return $sce.trustAsResourceUrl(vidSrc);
             };
