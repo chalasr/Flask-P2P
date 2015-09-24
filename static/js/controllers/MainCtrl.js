@@ -1,7 +1,7 @@
 (function(app) {
     app.controller('MainController', function ($sce, $rootScope, $scope, $filter, Room) {
 
-        $scope.peers = [], $scope.roomUsers = [], $scope.rooms = []
+        $scope.peers = [], $scope.roomUsers = [], $scope.rooms = [], $scope.messages = [];
         $scope.currentUser = '', $scope.currentRoom = '', $scope.connectionStatus = 'Not Connected';
         var sound = new Audio(document.location.origin + '/static/vendor/Sound.wav');
         var soundtwo = new Audio(document.location.origin + '/static/vendor/Sound2.wav');
@@ -83,7 +83,7 @@
                 me: null,
                 room: null,
                 _events: {},
-                usernames: [],
+                usernames: []
             };
 
             rtc.on = function(event, callback) {
@@ -130,7 +130,7 @@
                 rtc.stream.onerror = function(event) {
                     if (rtc.stream.readyState != 1 && rtc.connected) {
                         rtc.connected = false;
-                        rtc.fire('disconnect', stream_url);
+                        rtc.dataChannels[username].send(message);
                     }
                     rtc.fire('event_source_error', stream_url, event);
                 }
@@ -187,6 +187,7 @@
                         can_close = true;
                     }
                     if (event.target.iceConnectionState == 'disconnected') {
+                        $scope.removePeer(username);
                         rtc.fire('data_stream_close', username, channel);
                     }
                     rtc.fire('ice_state_change', event);
@@ -324,26 +325,29 @@
             rtc.send = function(message) {
                 for (var x = 0; x < rtc.usernames.length; x++) {
                     var username = rtc.usernames[x];
-                    if(rtc.dataChannels[username])
-                    rtc.dataChannels[username].send(message);
+                    if(rtc.dataChannels[username] && rtc.dataChannels[username].readyState == 'open')
+                        rtc.dataChannels[username].send(message);
                 }
                 rtc.fire('message', rtc.username, message.sanitize());
             }
 
             rtc.join_room = function(room) {
-                if(room == rtc.room || room == $scope.currentRoom) {
-                    return toastr.warning('You are already in this room');
+                if($scope.currentRoom != ''){
+                    if(room == rtc.room || room == $scope.currentRoom) {
+                        return toastr.warning('You are already in this room');
+                    }
+                    $scope.leaveOtherRooms(room);
                 }
-                rtc.room = room;
-                $scope.currentRoom = room;
-                $scope.getUsers(room);
                 if (rtc.connected)
                     rtc.emit('join_room', { room: room, encryption: null })
                         .done(function(json) {
+                           sound.play();
+                           rtc.room = room;
+                           $scope.getRooms();
+                           $scope.currentRoom = room;
+                           $scope.getUsers(room);
                             rtc.fire('joined_room', room)
                                .fire('get_peers', json);
-                               sound.play();
-                               $scope.getRooms();
                         });
             }
 
@@ -484,7 +488,7 @@
             .on ('connect', function() {
                 $scope.connectionStatus = 'Connected';
                 connection_icon.setAttribute('class', base_connection_icon + 'online');
-                print.success('Connected.');
+                toastr.info('Connected.');
             })
             .on('disconnect', function() {
                 $scope.connectionStatus = 'Disconnected';
@@ -493,9 +497,8 @@
             .on ('set_username_success', function() {
                 toastr.success('Username successfully set to %0.'.f(rtc.username.bold()));
             })
-            .on ('user_leave', function(data) {
+            .on('user_leave', function(data) {
                 var leaveUser = data.username ? data.username  : '';
-                toastr.info(leaveUser + ' has leave room');
                 $scope.removePeer(leaveUser);
             })
             .on('joined_room', function() {
@@ -585,6 +588,9 @@
             };
 
             $scope.addPeer = function(stream, username) {
+                if(!$scope.peers[$scope.currentRoom]){
+                    $scope.peers[$scope.currentRoom] = [];
+                }
                 var streamUrl = window.URL.createObjectURL(stream);
                 var peerId = stream.id;
                 var newPeer = {
@@ -592,17 +598,26 @@
                     username: username,
                     stream: streamUrl
                 };
-                var count = $scope.peers.filter(function(peer){
+                var count = $scope.peers[$scope.currentRoom].filter(function(peer){
                    return (peer.username === newPeer.username)
                 });
                 if(count.length === 0) {
-                    $scope.peers.push(newPeer);
+                    $scope.peers[$scope.currentRoom].push(newPeer);
                 }
                 $scope.$apply();
             };
 
             $scope.removePeer = function(user) {
-                $scope.peers = $scope.peers.filter(function(peer){
+                if(!$scope.peers[$scope.currentRoom]){
+                    $scope.peers[$scope.currentRoom] = [];
+                }
+                var count = $scope.peers[$scope.currentRoom].filter(function(peer){
+                   return (peer.username == user)
+                });
+                if(count.length > 0) {
+                    toastr.info('%0.'.f(user.bold()) + ' has leave room');
+                }
+                $scope.peers[$scope.currentRoom] = $scope.peers[$scope.currentRoom].filter(function(peer){
                    return (peer.username != user)
                 });
                 if(!$scope.$$phase)
@@ -611,24 +626,35 @@
 
             $scope.getRooms = function() {
                 Room.getRooms()
-                  .success(function(data){
+                  .success(function(data) {
                       $scope.rooms = data;
                   })
-                  .error(function(data){
+                  .error(function(data) {
                       console.log(data);
                   })
             };
 
             $scope.getUsers = function() {
-              if($scope.currentRoom == "")
-                  return;
-              Room.getUsers($scope.currentRoom)
-                  .success(function(data) {
-                      $scope.users = data;
-                  })
-                  .error(function(data) {
-                      console.log(data);
-                  })
+                if($scope.currentRoom == ""){
+                    return;
+                }
+                Room.getUsers($scope.currentRoom)
+                    .success(function(data) {
+                        $scope.users = data;
+                    })
+                    .error(function(data) {
+                        console.log(data);
+                    })
+            };
+
+            $scope.leaveOtherRooms = function(wantedRoom) {
+                Room.leaveRooms(wantedRoom, $scope.currentUser)
+                    .success(function(data) {
+
+                    })
+                    .error(function(data) {
+
+                    });
             };
 
             window.rtc = rtc;
@@ -701,7 +727,7 @@
                 log('new ICE state: ' + event.target.iceConnectionState, event);
             })
             .on('add_data_channel', function(username, event) {
-                log('Added data cannel for ' + username, event);
+                log('Added Data Channel for ' + username, event);
             })
             .on('pc_error', function(username, event) {
                 log('Peer connection error with ' + username, event);

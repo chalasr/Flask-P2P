@@ -193,7 +193,6 @@ def heartbeat(delay):
         time.sleep(delay)
 thread.start_new_thread(heartbeat, (heartbeat_interval,))
 
-## API
 
 @app.before_request
 def before_request():
@@ -355,6 +354,15 @@ def get_users_in_room(room):
         get_users_in_room.insert(0, user.username)
     return jsonify(get_users_in_room)
 
+@app.route('/leave_other_rooms/<newroom>/<username>', methods=['GET'])
+def leave_rooms(newroom, username):
+    user = rtc.users_by_username[username];
+    # user.emit_to_rooms('user_leave');
+    for room in rtc.rooms:
+        if(room != newroom):
+            room = rtc.get_room(room)
+            room.user_leave(user)
+    return jsonify(success=True)
 
 if __name__ == '__main__':
     app.run(threaded=True, host='0.0.0.0')
