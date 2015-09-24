@@ -31,27 +31,20 @@
                     <li>
                         <a id="username"><i class="fa fa-user"></i> Anonymous</a>
                     </li>
-                    <li class="dropdown"  ng-init="getRooms()">
+                    <li class="dropdown" ng-init="getRooms()">
                         <a href="" class="dropdown-toggle" data-toggle="dropdown">Rooms<b class="caret"></b></a>
                         <ul id="roomsMenu" class="dropdown-menu">
                             <ul class="column-dropdown" ng-repeat="room in rooms">
-                              <li><a ng-click="joinRoom(room)"><% room %></a></li>
-                            </ul>
-                            <ul class="column-dropdown">
-                              <li><a id="reloadRooms">Reload <i class="fa fa-refresh"></i></a></li>
+                              <li class="joinRoom" data-room="<% room %>" ng-click="joinRoom(room)"><a><% room %></a></li>
                             </ul>
                         </ul>
                     </li>
 
-                    <li class="dropdown"  ng-init="getUsers(room)">
+                    <li class="dropdown" ng-init="getUsers(room)" ng-click="getUsers(currentRoom)">
                         <a href="" class="dropdown-toggle" data-toggle="dropdown">Users in room<b class="caret"></b></a>
                         <ul id="usersMenu" class="dropdown-menu">
                             <ul class="column-dropdown" ng-repeat="user in users">
                                 <li><a><% user %></a></li>
-                            </ul>
-
-                            <ul class="column-dropdown">
-                              <li><a id="reloadUsers">Reload<i class="fa fa-refresh"></i></a></li>
                             </ul>
                         </ul>
                     </li>
@@ -104,8 +97,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Welcome</h4>
+            <h4 class="modal-title" id="myModalLabel">Welcome to Cheesy P2P</h4>
           </div>
           <div class="modal-body">
             <div>
