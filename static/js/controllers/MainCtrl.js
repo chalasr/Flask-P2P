@@ -257,7 +257,6 @@
                 var sdp = new SessionDescription(JSON.parse(sdp_in));
                 pc.setRemoteDescription(sdp, function() {
                     rtc.fire('set_remote_description', username);
-                    soundtwo.play();
                 },function(err) {
                     rtc.fire('set_remote_description_error', username)
                 });
