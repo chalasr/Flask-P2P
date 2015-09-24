@@ -341,6 +341,7 @@
                     rtc.emit('set_username', { username: username })
                         .done(function() {
                             rtc.fire('set_username_success', username);
+                            setTimeout("$('#myModal').modal('hide')", 500);
                         })
                         .fail(function(error) {
                             $scope.currentUser = '';
@@ -493,19 +494,19 @@
             })
             .on ('got_peers', function(data) {
                 if (rtc.first_connect)
-                    print.info('Entered ' + rtc.room);
+                    toastr.info('Entered ' + rtc.room);
 
                 if (rtc.usernames.length == 0)
-                    return print.info('You are the only user in this room.');
+                    return toastr.info('You are the only user in this room.');
 
                 var users = '';
                 for (var x = 0; x < rtc.usernames.length; x++) {
                     users += rtc.usernames[x].bold() + ' ';
                 }
-                print.info('Users in room: ' + users);
+                toastr.info('Users in room: ' + users);
             })
             .on('user_join', function(data) {
-                print.info('User %0 has joined.'.f(data.username.bold()));
+                toastr.info('User %0 has joined.'.f(data.username.bold()));
             })
             .on('message', function(username, message) {
                 var $message = $(
@@ -592,7 +593,6 @@
 
             $scope.login = function() {
                 rtc.set_username($scope.currentUser);
-                setTimeout("$('#myModal').modal('hide')", 500);
             };
 
             $scope.joinRoom = function(room) {
