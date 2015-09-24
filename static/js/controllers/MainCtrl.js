@@ -578,12 +578,6 @@
                 $scope.joinRoom(room);
             });
 
-            $('.joinRoom').click(function(event){
-                var room = $('#createRoom').val();
-                console.log(room);
-                $scope.joinRoom(room);
-            });
-
             $scope.getVideo = function(vidSrc) {
                 return $sce.trustAsResourceUrl(vidSrc);
             };
