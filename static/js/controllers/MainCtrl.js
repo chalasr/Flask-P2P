@@ -485,9 +485,11 @@
                 print.success('Username successfully set to %0.'.f(rtc.username.bold()));
                 username_span.innerHTML = rtc.username;
             })
-            .on ('user_leave', function() {
-                print.success('User has leave room');
-                username_span.innerHTML = rtc.username;
+            .on ('user_leave', function(data) {
+                var leaveUser = data.username ? data.username  : '';
+                print.success(leaveUser + ' has leave room');
+                $scope.removePeer(leaveUser);
+                console.log('USER HAS LEAVE ROOM ' + leaveUser);
             })
             .on('joined_room', function() {
                 $scope.currentRoom = rtc.room;
@@ -613,8 +615,19 @@
                 if(count.length === 0) {
                     $scope.peers.push(newPeer);
                 }
-
                 $scope.$apply();
+            };
+
+            $scope.removePeer = function(user) {
+                angular.forEach($scope.peers, function(peer) {
+                    if(peer.username === user){
+                        $scope.peers.splice(peer, 1);
+                        console.log(peer);
+                        console.log($scope.peers);
+                    }
+                });
+                if(!$scope.$$phase)
+                    $scope.$apply();
             };
 
             $scope.getRooms = function() {
