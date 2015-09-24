@@ -619,12 +619,8 @@
             };
 
             $scope.removePeer = function(user) {
-                angular.forEach($scope.peers, function(peer) {
-                    if(peer.username === user){
-                        $scope.peers.splice(peer, 1);
-                        console.log(peer);
-                        console.log($scope.peers);
-                    }
+                $scope.peers = $scope.peers.filter(function(peer){
+                   return (peer.username != user)
                 });
                 if(!$scope.$$phase)
                     $scope.$apply();
