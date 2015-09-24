@@ -325,6 +325,7 @@
 
             rtc.join_room = function(room) {
                 rtc.room = room;
+                $scope.currentRoom = room;
                 if (rtc.connected)
                     rtc.emit('join_room', { room: room, encryption: null })
                         .done(function(json) {
@@ -584,6 +585,18 @@
                   })
             };
 
+            $scope.getUsers = function(){
+              if($scope.currentRoom != ""){
+                  Room.getUsers($scope.currentRoom)
+                    .success(function(data){
+                      $scope.users = data;
+                    })
+                    .error(function(data){
+                      console.log(data);
+                    })
+                }
+            };
+
             $scope.joinRoom = function(room) {
                 rtc.join_room(room);
             };
@@ -595,6 +608,12 @@
                 event.preventDefault();
                 $scope.getRooms();
                 return false;
+            });
+
+            angular.element('#reloadUsers').click(function(event){
+              event.preventDefault();
+              $scope.getUsers($scope.currentRoom);
+              return false;
             });
 
         })();

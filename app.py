@@ -355,6 +355,16 @@ def get_rooms():
         getRooms.insert(0, room)
     return jsonify(getRooms)
 
+@app.route('/get_users_in_room/<room>', methods=['GET'])
+def get_users_in_room(room):
+    get_users_in_room = []
+    room = rtc.get_room(room)
+    for user in room.users:
+        get_users_in_room.insert(0, user.username)
+    return jsonify(get_users_in_room)
+
+
+
 
 if __name__ == '__main__':
     app.run(threaded=True)

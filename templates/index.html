@@ -36,8 +36,22 @@
                             <ul class="column-dropdown" ng-repeat="room in rooms">
                               <li><a ng-click="joinRoom(room)"><% room %></a></li>
                             </ul>
+
                             <ul class="column-dropdown">
                               <li><a id="reloadRooms">Reload <i class="fa fa-refresh"></i></a></li>
+                            </ul>
+                        </ul>
+                    </li>
+
+                    <li class="dropdown"  ng-init="getUsers(room)">
+                        <a href="" class="dropdown-toggle" data-toggle="dropdown">Users in room<b class="caret"></b></a>
+                        <ul id="usersMenu" class="dropdown-menu">
+                            <ul class="column-dropdown" ng-repeat="user in users">
+                                <li><a><% user %></a></li>
+                            </ul>
+
+                            <ul class="column-dropdown">
+                              <li><a id="reloadUsers">Reload<i class="fa fa-refresh"></i></a></li>
                             </ul>
                         </ul>
                     </li>
