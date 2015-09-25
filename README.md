@@ -4,14 +4,20 @@ Multi-rooms WebRTC P2P messaging web app, containing a light server written in P
 
 ## Tools
 
-- Python with **Flask**
+- **Python** with *Flask*
 - **WebRTC**
 - **AngularJS**
 
+## Requirements
+
+- Python >= 2.7
+- Browser support for WebRTC
+
 ## CREDITS
 
-[@chalasr](https://github.com/chalasr) -
-[@martinlavanant](https://github.com/chalasr)
+[@chalasr](https://github.com/chalasr)
+
+[@martinlavanant](https://github.com/martinlavanant)
 
 ## LICENSE
 
