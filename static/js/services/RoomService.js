@@ -1,3 +1,5 @@
+/*global angular:false */
+
 (function(app) {
     app.factory('Room', function ($http) {
         return {
@@ -10,7 +12,7 @@
             leaveRooms : function(wantedRoom, username){
                 return $http.get('/leave_other_rooms/' + wantedRoom + '/' + username);
             },
-        }
+        };
     });
 
 })(angular.module('RoomService', []));
