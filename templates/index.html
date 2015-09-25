@@ -77,19 +77,20 @@
 
         <div class="col-md-6" id="messages">
           <div data-ng-if="messages[currentRoom]" class="messages" data-ng-repeat="msg in messages[currentRoom]">
-              <span class="chat-user"><b><% msg.username %></b></span>
-              <span class="fa fa-chevron-right"></span>
-              <span class="message-inner"><% msg.content %></span>
+              <span data-ng-if="!msg.type" class="chat-user"><b><% msg.username %></b></span>
+              <span data-ng-if="!msg.type" class="fa fa-chevron-right"></span>
+              <span data-ng-if="!msg.type" class="message-inner"><% msg.content %></span>
+              <span data-ng-if="msg.type" class="message-inner info"><% msg.content %></span>
           </div>
         </div>
 
         <div class="col-md-6 video-wrapper">
           <video id="localVideo" style="float:right;max-width:50%;border: solid 3px #90CA0A;" autoplay muted></video>
-          <video-player ng-repeat="peer in peers[currentRoom]">
-              <video autoplay style="float:right;max-width:50%;" id="<% peer.username %>" ng-src="<% getVideo(peer.stream) %>"></video>
-              <button class="btn btn-default searchbtn fa fa-heartbeat" ng-click="buzz()" id="Buzz" type="button"></button>
+          <video-player data-ng-repeat="peer in peers[currentRoom]">
+              <video autoplay style="float:right;max-width:50%;" id="<% peer.username %>" data-ng-src="<% getVideo(peer.stream) %>"></video>
           </video-player>
         </div>
+
 
     </div>
 

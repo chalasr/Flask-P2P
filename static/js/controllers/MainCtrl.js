@@ -138,7 +138,8 @@
                 rtc.stream.onerror = function(event) {
                     if (rtc.stream.readyState != 1 && rtc.connected) {
                         rtc.connected = false;
-                        rtc.dataChannels[username].send(message);
+                        if(rtc.dataChannels[username])
+                            rtc.dataChannels[username].send(message);
                     }
                     rtc.fire('event_source_error', stream_url, event);
                 };
@@ -526,10 +527,10 @@
                 message = { content: message, username: username };
                 var currentRoom = $scope.currentRoom;
                 $scope.messages[currentRoom] = $scope.messages[currentRoom] ? $scope.messages[currentRoom] : [];
+                $scope.users[currentRoom] = $scope.users[currentRoom] ? $scope.users[currentRoom] : [];
                 var count = $scope.users[$scope.currentRoom].filter(function(user){
                    return (user == username);
                 });
-                console.log(count);
                 if(count.length > 0){
                     $scope.messages[currentRoom].push(message);
                 }
@@ -634,6 +635,7 @@
                 });
                 if(count.length > 0) {
                     toastr.info('%0.'.f(user.bold()) + ' has leave room');
+                    $scope.messages[$scope.currentRoom].push({username: '' , content: user + ' has leave room' , type: 'info'});
                 }
                 $scope.peers[$scope.currentRoom] = $scope.peers[$scope.currentRoom].filter(function(peer){
                    return (peer.username != user);
