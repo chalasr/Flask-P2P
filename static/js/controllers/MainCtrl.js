@@ -11,7 +11,7 @@
 (function(app) {
     app.controller('MainController', function ($sce, $scope, Room) {
 
-        $scope.peers = []; $scope.roomUsers = []; $scope.rooms = []; $scope.messages = [];
+        $scope.peers = []; $scope.roomUsers = []; $scope.rooms = []; $scope.messages = []; $scope.users = [];
         $scope.currentUser = ''; $scope.currentRoom = ''; $scope.connectionStatus = 'Not Connected';
         var username, message, can_close, channel, peerConnections, error;
         var sound = new Audio(document.location.origin + '/static/vendor/Sound.wav');
@@ -525,11 +525,17 @@
                 message = { content: message, username: username };
                 var currentRoom = $scope.currentRoom;
                 $scope.messages[currentRoom] = $scope.messages[currentRoom] ? $scope.messages[currentRoom] : [];
-                $scope.messages[currentRoom].push(message);
+                var count = $scope.users[$scope.currentRoom].filter(function(user){
+                   return (user == username);
+                });
+                console.log(count);
+                if(count.length > 0){
+                    $scope.messages[currentRoom].push(message);
+                }
                 $cont[0].scrollTop = $cont[0].scrollHeight;
                 if(username != $scope.currentUser){
                    soundthree.play();
-               }
+                }
                 if(!$scope.$$phase)
                     $scope.$apply();
             });
@@ -651,7 +657,7 @@
                 }
                 Room.getUsers($scope.currentRoom)
                     .success(function(data) {
-                        $scope.users = data;
+                        $scope.users[$scope.currentRoom] = data;
                     })
                     .error(function(data) {
                         console.log(data);
