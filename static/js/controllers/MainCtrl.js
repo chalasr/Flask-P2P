@@ -1,10 +1,20 @@
-(function(app) {
-    app.controller('MainController', function ($sce, $rootScope, $scope, $filter, Room) {
 
-        $scope.peers = [], $scope.roomUsers = [], $scope.rooms = [], $scope.messages = [];
-        $scope.currentUser = '', $scope.currentRoom = '', $scope.connectionStatus = 'Not Connected';
+//Exception ie8 trycatch
+/*jshint -W002 */
+
+//Vendors
+/*global EventSource:false */
+/*global $:false */
+/*global angular:false */
+/*global toastr:false */
+
+(function(app) {
+    app.controller('MainController', function ($sce, $scope, Room) {
+
+        $scope.peers = []; $scope.roomUsers = []; $scope.rooms = []; $scope.messages = [];
+        $scope.currentUser = ''; $scope.currentRoom = ''; $scope.connectionStatus = 'Not Connected';
+        var username, message, can_close, channel, peerConnections, error;
         var sound = new Audio(document.location.origin + '/static/vendor/Sound.wav');
-        var soundtwo = new Audio(document.location.origin + '/static/vendor/Sound2.wav');
 
         navigator.getUserMedia({"video": true, "audio": true},
             function(stream){
@@ -37,27 +47,25 @@
                 // Bold a string
                 strings.bold = function() {
                     return "<strong>%0</strong>".f(this);
-                }
+                };
                  // Converts into a unique number based on the sum of the char code values of each char.
                 strings.toID = function() {
                     var id = 0;
                     for (var x = 0; x < this.length; x++)
                         id += this.charCodeAt(x);
                     return id;
-                }
+                };
                 // Sanitize to avoid XSS
                 strings.sanitize = function() {
-                    return this.replace(/[\<\>''\/]/g, function(c) {
+                    return this.replace(/[<\>''\/]/g, function(c) {
                         var sanitize_replace = {
                             '<' : '&lt;',
                             '>' : '&gt;',
-                            "'" : '&quot;',
-                            "'" : '&#x27;',
                             '/' : '&#x2F;'
-                        }
+                        };
                         return sanitize_replace[c];
                     });
-                }
+                };
             })(String.prototype, /%(\d+)|%%/g);
 
             var check = function(str) {
@@ -76,7 +84,6 @@
                 },
                 peerConnections: {},
                 dataChannels: {},
-                connected: {},
                 streams: [],
                 socket: null,
                 connected: false,
@@ -89,13 +96,13 @@
             rtc.on = function(event, callback) {
                 var events = event.split(' ');
                 for (var x = 0; x < events.length; x++) {
-                    if (events[x].length == 0)
+                    if (events[x].length === 0)
                         continue;
                     rtc._events[events[x]] = rtc._events[events[x]] || [];
                     rtc._events[events[x]].push(callback);
                 }
                 return this;
-            }
+            };
 
             rtc.fire = function(event) {
                 var events = event.split(' ');
@@ -103,10 +110,10 @@
                 for (var x = 0; x < events.length; x++) {
                     var callbacks = rtc._events[events[x]] || [];
                     for(var y = 0; y < callbacks.length; y++)
-                        callbacks[y].apply(null, args)
+                        callbacks[y].apply(null, args);
                 }
                 return this;
-            }
+            };
 
             rtc.connect = function(stream_url) {
 
@@ -118,14 +125,14 @@
                     var data = JSON.parse(event.data);
                     rtc.fire('event_source_message', event);
                     rtc.fire(data.event, data);
-                }
+                };
 
                 rtc.stream.onopen = function(event) {
                     if (rtc.stream.readyState == 1) {
                         rtc.connected = true;
                         rtc.fire('connect', stream_url, event);
                     }
-                }
+                };
 
                 rtc.stream.onerror = function(event) {
                     if (rtc.stream.readyState != 1 && rtc.connected) {
@@ -133,8 +140,8 @@
                         rtc.dataChannels[username].send(message);
                     }
                     rtc.fire('event_source_error', stream_url, event);
-                }
-            }
+                };
+            };
 
             rtc.emit = function(event, data) {
                 var type = typeof data === 'string' ? data : 'post';
@@ -145,7 +152,7 @@
                     type: type,
                     headers: { "X-Stream-ID": rtc.stream_id }
                 });
-            }
+            };
 
             rtc.create_peer_connection = function(username) {
 
@@ -157,7 +164,7 @@
                 rtc.fire('new_peer_connection', username, config);
 
                 pc.onicecandidate = function(event) {
-                    if (!event.candidate || event.candidate == null) return;
+                    if (!event.candidate || event.candidate === null) return;
 
                     rtc.emit('send_ice_candidate', {
                         label: event.candidate.label,
@@ -180,7 +187,7 @@
 
                 pc.onremovestream = function(event) {
                     rtc.fire('remove_peer_connected', username, event.stream);
-                }
+                };
 
                 pc.oniceconnectionstatechange = function(event) {
                     if (event.target.iceConnectionState == 'connected') {
@@ -203,10 +210,10 @@
                 };
 
                 pc.onidpassertionerror = pc.onidpvalidationerror = function(e) {
-                    rtc.fire('pc_error', username, e)
+                    rtc.fire('pc_error', username, e);
                 };
                 return pc;
-            }
+            };
 
             rtc.send_offer = function(username) {
                 var pc = rtc.peerConnections[username];
@@ -225,7 +232,7 @@
                 }, function(error) {
                     rtc.fire('send_offer_error', username, error);
                 });
-            }
+            };
 
             rtc.receive_offer = function(username, sdp) {
                 var pc = rtc.peerConnections[username];
@@ -236,47 +243,47 @@
                 },function(error){
                     rtc.fire('set_remote_description_error', username, error);
                 });
-            }
+            };
 
             rtc.send_answer = function(username) {
                 var pc = rtc.peerConnections[username];
 
                 pc.createAnswer(function(session_description) {
-                    rtc.fire('send_offer', username)
+                    rtc.fire('send_offer', username);
                     pc.setLocalDescription(session_description, function() {
                         rtc.emit('send_answer',{
                             username: username,
                             sdp: JSON.stringify(session_description)
                         });
-                        rtc.fire('set_local_description', username)
-                    },function(err) {
-                        rtc.fire('set_local_description_error', username, err);
+                        rtc.fire('set_local_description', username);
+                    },function(error) {
+                        rtc.fire('set_local_description_error', username, error);
                     });
-                }, function(e) {
-                    rtc.fire('send_offer_error'. username, err);
+                }, function() {
+                    rtc.fire('send_offer_error'. username, error);
                 });
-            }
+            };
 
             rtc.receive_answer = function(username, sdp_in) {
                 var pc = rtc.peerConnections[username];
                 var sdp = new SessionDescription(JSON.parse(sdp_in));
                 pc.setRemoteDescription(sdp, function() {
                     rtc.fire('set_remote_description', username);
-                },function(err) {
-                    rtc.fire('set_remote_description_error', username)
+                },function() {
+                    rtc.fire('set_remote_description_error', username);
                 });
-            }
+            };
 
             rtc.create_data_channel = function(username, label) {
                 var pc = rtc.peerConnections[username];
-                var label = label || String(username);
+                label = label || String(username);
                 if (rtc.dataChannelSupport == reliable_false) {
                     return;
                 }
                 try {
                     channel = pc.createDataChannel(label, { reliable: true });
                 } catch (error) {
-                    rtc.fire('data_channel_error', username, error)
+                    rtc.fire('data_channel_error', username, error);
                     throw error;
                 }
                 return rtc.add_data_channel(username, channel);
@@ -290,7 +297,8 @@
                 };
 
                 channel.onclose = function(event) {
-                    delete rtc.dataChannels[username];
+										event = event;
+                  	delete rtc.dataChannels[username];
                     $scope.removePeer(username);
                     rtc.fire('data_stream_close', username, channel);
                 };
@@ -305,22 +313,24 @@
                 };
 
                 rtc.dataChannels[username] = channel;
-                rtc.fire('data_channel_added', username, channel)
+                rtc.fire('data_channel_added', username);
                 return channel;
-            }
+            };
 
             rtc.add_streams = function() {
                 for (var i = 0; i < rtc.streams.length; i++) {
                     var stream = rtc.streams[i];
-                    for (var connection in rtc.peerConnections) {
-                        rtc.peerConnections[connection].addStream(stream);
+                  	for (var connection in rtc.peerConnections) {
+                      	if (rtc.hasOwnProperty(peerConnections)) {
+		               		  		rtc.peerConnections[connection].addStream(stream);
+                        }
                     }
                 }
-            }
+            };
 
             rtc.attach_stream = function(stream, dom_id) {
                 document.getElementById(dom_id).src = window.URL.createObjectURL(stream);
-            }
+            };
 
             rtc.send = function(message) {
                 for (var x = 0; x < rtc.usernames.length; x++) {
@@ -329,10 +339,10 @@
                         rtc.dataChannels[username].send(message);
                 }
                 rtc.fire('message', rtc.username, message.sanitize());
-            }
+            };
 
             rtc.join_room = function(room) {
-                if($scope.currentRoom != ''){
+                if($scope.currentRoom !== ''){
                     if(room == rtc.room || room == $scope.currentRoom) {
                         return toastr.warning('You are already in this room');
                     }
@@ -349,31 +359,34 @@
                             rtc.fire('joined_room', room)
                                .fire('get_peers', json);
                         });
-            }
+            };
 
             rtc.set_username = function(username) {
                 if(!check(username))
-                    return toastr.warning('Your nickname contains illegal characters, please change it')
+                    return toastr.warning('Your nickname contains illegal characters, please change it');
                 if (rtc.connected) {
                     rtc.emit('set_username', { username: username })
                         .done(function() {
                             rtc.username = username;
                             rtc.fire('set_username_success', username);
-                            setTimeout("$('#myModal').modal('hide')", 500);
+                            setTimeout(function () {
+                              $('#myModal').modal('hide');
+                          }, 500);
+
                         })
                         .fail(function(error) {
                             $scope.currentUser = '';
                             if(error.responseText == '{"error": "Username already in use"}')
-                                toastr.error('Nom d\'utilisateur déjà pris')
-                            rtc.fire('set_username_error', username, error)
+                                toastr.error('Nom d\'utilisateur déjà pris');
+                            rtc.fire('set_username_error', username, error);
                         });
                 }
-            }
+            };
 
             rtc.packet_inbound = function(username, message) {
                 message = message.sanitize();
                 rtc.fire('message', username, message, true);
-            }
+            };
 
             /* WebRTC SSE Callbacks */
             rtc.on('connect', function() {
@@ -383,7 +396,7 @@
             })
 
             .on('hello', function(data) {
-                rtc.stream_id = data.stream_id
+                rtc.stream_id = data.stream_id;
             })
 
             .on('disconnect', function() {
@@ -402,12 +415,12 @@
                 }
                 rtc.usernames = usernames;
                 rtc.users = data.users;
-                rtc.first_connect = true
+                rtc.first_connect = true;
                 rtc.fire('got_peers', data);
                 rtc.first_connect = false;
             })
 
-            .on('set_username_success', function(data) {
+            .on('set_username_success', function() {
                 if (rtc.room)
                     rtc.join_room(rtc.room);
             })
@@ -443,7 +456,7 @@
             .on('user_leave', function(data) {
                 var leaveUser = data.username ? data.username  : '';
                 $scope.removePeer(leaveUser);
-            })
+            });
 
             rtc.dataChannelConfig = {optional: [ {'DtlsSrtpKeyAgreement': true} ] };
             // Check if Data Channel is supported
@@ -466,10 +479,8 @@
 
             var $cont = $('#messages');
             var connection_icon = document.getElementById('connection_icon');
-            var messages_div = document.getElementById('messages');
             var buffer_input = document.getElementById('buffer_input');
             var base_connection_icon = 'fa fa-circle ';
-            var levels = ['success', 'error', 'operation', 'info']
 
             rtc.on('connecting', function() {
                 $scope.connectionStatus = 'Connecting...';
@@ -490,11 +501,11 @@
             .on('joined_room', function() {
                 $scope.currentRoom = rtc.room;
             })
-            .on ('got_peers', function(data) {
+            .on ('got_peers', function() {
                 if (rtc.first_connect)
                     toastr.info('Entered ' + rtc.room);
 
-                if (rtc.usernames.length == 0)
+              if (rtc.usernames.length === 0)
                     return toastr.info('You are the only user in this room.');
 
                 var users = '';
@@ -507,18 +518,18 @@
                 toastr.info('User %0 has joined.'.f(data.username.bold()));
             })
             .on('message', function(username, message) {
-                var message = { content: message, username: username };
+                message = { content: message, username: username };
                 var currentRoom = $scope.currentRoom;
                 $scope.messages[currentRoom] = $scope.messages[currentRoom] ? $scope.messages[currentRoom] : [];
                 $scope.messages[currentRoom].push(message);
-                $cont[0].scrollTop = $cont[0].scrollHeight
+                $cont[0].scrollTop = $cont[0].scrollHeight;
                 if(!$scope.$$phase)
                     $scope.$apply();
-            })
+            });
             $cont[0].scrollTop = $cont[0].scrollHeight;
             $('#buffer_input').keyup(function(e) {
                 if (e.keyCode == 13)
-                    $cont[0].scrollTop = $cont[0].scrollHeight
+                    $cont[0].scrollTop = $cont[0].scrollHeight;
             });
 
             buffer_input.addEventListener('keydown', function(event) {
@@ -526,9 +537,9 @@
                     return;
                 event.preventDefault();
                 var input = buffer_input.value;
-                $(buffer_input).val('')
+                $(buffer_input).val('');
                 setTimeout(function() {
-                    $(buffer_input).val('')
+                    $(buffer_input).val('');
                 },1);
                 if (input.length === 0)
                     return;
@@ -547,7 +558,7 @@
                 }
             });
 
-            $('#submitRoom').click(function(event){
+            $('#submitRoom').click(function(){
                 var room = $('#createRoom').val();
                 console.log(room);
                 if(!check(room))
@@ -561,7 +572,9 @@
             };
 
             $scope.getLoginForm = function(){
-                setTimeout("$('#myModal').modal({ backdrop: 'static'})", 500);
+                setTimeout(function () {
+                    $('#myModal').modal({ backdrop: 'static'});
+                }, 500);
             };
 
             $scope.login = function() {
@@ -584,7 +597,7 @@
                     stream: streamUrl
                 };
                 var count = $scope.peers[$scope.currentRoom].filter(function(peer){
-                   return (peer.username === newPeer.username)
+                   return (peer.username === newPeer.username);
                 });
                 if(count.length === 0) {
                     $scope.peers[$scope.currentRoom].push(newPeer);
@@ -598,13 +611,13 @@
                     $scope.peers[$scope.currentRoom] = [];
                 }
                 var count = $scope.peers[$scope.currentRoom].filter(function(peer){
-                   return (peer.username == user)
+                   return (peer.username == user);
                 });
                 if(count.length > 0) {
                     toastr.info('%0.'.f(user.bold()) + ' has leave room');
                 }
                 $scope.peers[$scope.currentRoom] = $scope.peers[$scope.currentRoom].filter(function(peer){
-                   return (peer.username != user)
+                   return (peer.username != user);
                 });
                 if(!$scope.$$phase)
                     $scope.$apply();
@@ -617,11 +630,11 @@
                   })
                   .error(function(data) {
                       console.log(data);
-                  })
+                  });
             };
 
             $scope.getUsers = function() {
-                if($scope.currentRoom == ""){
+                if($scope.currentRoom === ""){
                     return;
                 }
                 Room.getUsers($scope.currentRoom)
@@ -630,31 +643,25 @@
                     })
                     .error(function(data) {
                         console.log(data);
-                    })
+                    });
             };
 
             $scope.leaveOtherRooms = function(wantedRoom) {
                 Room.leaveRooms(wantedRoom, $scope.currentUser)
-                    .success(function(data) {
-
-                    })
                     .error(function(data) {
-
+												console.log(data);
                     });
             };
 
             window.rtc = rtc;
             rtc.connect(document.location.origin + '/stream');
 
-        })();
+            /**
+             * Log service
+             * @param  {Object} rtc
+             */
 
-        /**
-         * Log service
-         * @param  {Object} rtc
-         */
-        (function(rtc) {
-
-            var pad0 = function(number) { return number < 10 ? '0' + number : number }
+            var pad0 = function(number) { return number < 10 ? '0' + number : number; };
             var log = function() {
                 var args = Array.prototype.slice.call(arguments, 0);
                 var date = new Date();
@@ -664,7 +671,7 @@
                     pad0(date.getSeconds())));
                 console.log.apply(console, args);
                 return log;
-            }
+            };
 
             rtc.log_data_stream_data = false;
             rtc.log_heartbeat = false;
@@ -721,8 +728,8 @@
             .on('set_local_description', function(username) {
                 log('Set LocalDescription for ' + username);
             })
-            .on('set_local_description_error', function(username, error) {
-                log('Set LocalDescription error with ')
+            .on('set_local_description_error', function() {
+                log('Set LocalDescription error with ');
             })
             .on('send_offer', function(username) {
                 log('Sent PC offer to ' + username);
@@ -742,7 +749,7 @@
             .on('set_remote_description_error', function(username, error) {
                 log('RemoteDescription error with ' + username, error);
             })
-            .on('data_channel_added', function(username, channel, label) {
+            .on('data_channel_added', function(username, label) {
                 log('added DataChannel with %0 labeled "%1"'.f(username, label));
             })
             .on('data_channel_error', function(username, error) {
@@ -759,7 +766,7 @@
                     log('received from %0: %1'.f(username, message));
             })
             .on('data_channel_reliable', function() {
-                log('Data channel reliability set to ')
+                log('Data channel reliability set to ');
             })
             .on('get_peers', function(data) {
                 log('get_peers', data);
@@ -777,6 +784,6 @@
                 log('failed to set username to ' + username);
             });
 
-        })(rtc);
+        })();
     });
 })(angular.module('MainCtrl', []));
