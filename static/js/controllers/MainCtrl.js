@@ -308,7 +308,6 @@
                 channel.onmessage = function(message) {
                     rtc.fire('data_stream_data', username, message);
                     rtc.fire('message', username, message.data);
-                    soundthree.play();
                 };
 
                 channel.onerror = function(error) {
@@ -528,6 +527,9 @@
                 $scope.messages[currentRoom] = $scope.messages[currentRoom] ? $scope.messages[currentRoom] : [];
                 $scope.messages[currentRoom].push(message);
                 $cont[0].scrollTop = $cont[0].scrollHeight;
+                if(username != $scope.currentUser){
+                   soundthree.play();
+               }
                 if(!$scope.$$phase)
                     $scope.$apply();
             });
