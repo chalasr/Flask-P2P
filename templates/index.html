@@ -13,7 +13,7 @@
     <link rel="stylesheet" type="text/css" href="http://cdn.chalasdev.fr/css/toastr.min.css"/>
 </head>
 
-<body logservice data-ng-controller="MainController">
+<body data-ng-controller="MainController">
 
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container">
@@ -35,18 +35,18 @@
                     <li class="dropdown" data-ng-init="getRooms()" data-ng-click="getRooms()">
                         <a href="" class="dropdown-toggle" data-toggle="dropdown">Rooms<b class="caret"></b></a>
                         <ul id="roomsMenu" class="dropdown-menu">
-                            <ul class="column-dropdown" data-ng-repeat="room in rooms">
-                              <li class="joinRoom" data-room="<% room %>" data-ng-click="joinRoom(room)"><a><% room %></a></li>
-                            </ul>
+                            <li class="column-dropdown" data-ng-repeat="room in rooms">
+                              <a class="joinRoom" data-room="<% room %>" data-ng-click="joinRoom(room)"><% room %></a>
+                            </li>
                         </ul>
                     </li>
 
                     <li class="dropdown" data-ng-init="getUsers(room)" data-ng-click="getUsers(currentRoom)">
                         <a href="" class="dropdown-toggle" data-toggle="dropdown">Users in room<b class="caret"></b></a>
                         <ul id="usersMenu" class="dropdown-menu">
-                            <ul class="column-dropdown" data-ng-repeat="user in users[currentRoom]">
-                                <li><a><% user %></a></li>
-                            </ul>
+                            <li class="column-dropdown" data-ng-repeat="user in users[currentRoom]">
+                                <a><% user %></a>
+                            </li>
                         </ul>
                     </li>
 

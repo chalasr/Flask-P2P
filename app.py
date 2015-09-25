@@ -20,7 +20,6 @@ class ExtensibleJSONEncoder(json.JSONEncoder):
             return obj.to_JSON()
         return super(ExtensibleJSONEncoder, self).default(obj)
 
-
 def jsonify(*args, **kwargs):
     indent = None
     status = kwargs.pop('_status', 200)
