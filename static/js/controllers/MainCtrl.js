@@ -295,6 +295,7 @@
                     channel.binaryType = 'arraybuffer';
                     rtc.connected[username] = true;
                     rtc.fire('data_stream_open', username);
+                    $scope.getUsers();
                 };
 
                 channel.onclose = function(event) {
@@ -521,6 +522,7 @@
             })
 
             .on('message', function(username, message) {
+                $scope.getUsers();
                 message = { content: message, username: username };
                 var currentRoom = $scope.currentRoom;
                 $scope.messages[currentRoom] = $scope.messages[currentRoom] ? $scope.messages[currentRoom] : [];
