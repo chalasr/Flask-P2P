@@ -559,13 +559,12 @@
                 if (input.length === 0)
                     return;
                 rtc.send(input);
-
                 return false;
             });
 
-            $('#createRoom').keydown(function(event){
+            $('#createRoom').keydown(function(event) {
                 var room = $(this).val();
-                if(event.keyCode == 13){
+                if(event.keyCode == 13) {
                     if(!check(room))
                         return toastr.warning('The name contains illegal characters, please change it');
                     $scope.joinRoom(room);
@@ -573,7 +572,7 @@
                 }
             });
 
-            $('#submitRoom').click(function(){
+            $('#submitRoom').click(function() {
                 var room = $('#createRoom').val();
                 console.log(room);
                 if(!check(room))
@@ -591,8 +590,8 @@
                 return $sce.trustAsResourceUrl(vidSrc);
             };
 
-            $scope.getLoginForm = function(){
-                setTimeout(function () {
+            $scope.getLoginForm = function() {
+                setTimeout(function() {
                     $('#myModal').modal({ backdrop: 'static'});
                 }, 500);
             };
@@ -606,7 +605,7 @@
             };
 
             $scope.addPeer = function(stream, username) {
-                if(!$scope.peers[$scope.currentRoom]){
+                if(!$scope.peers[$scope.currentRoom]) {
                     $scope.peers[$scope.currentRoom] = [];
                 }
                 var streamUrl = window.URL.createObjectURL(stream);
@@ -616,7 +615,7 @@
                     username: username,
                     stream: streamUrl
                 };
-                var count = $scope.peers[$scope.currentRoom].filter(function(peer){
+                var count = $scope.peers[$scope.currentRoom].filter(function(peer) {
                    return (peer.username === newPeer.username);
                 });
                 if(count.length === 0) {
@@ -627,18 +626,18 @@
             };
 
             $scope.removePeer = function(user) {
-                if(!$scope.peers[$scope.currentRoom]){
+                if(!$scope.peers[$scope.currentRoom]) {
                     $scope.peers[$scope.currentRoom] = [];
                 }
-                var count = $scope.peers[$scope.currentRoom].filter(function(peer){
+                var count = $scope.peers[$scope.currentRoom].filter(function(peer) {
                    return (peer.username == user);
                 });
                 if(count.length > 0) {
                     toastr.info('%0.'.f(user.bold()) + ' has leave room');
                     $scope.messages[$scope.currentRoom].push({username: '' , content: user + ' has leave room' , type: 'info'});
                 }
-                $scope.peers[$scope.currentRoom] = $scope.peers[$scope.currentRoom].filter(function(peer){
-                   return (peer.username != user);
+                $scope.peers[$scope.currentRoom] = $scope.peers[$scope.currentRoom].filter(function(peer) {
+                   return (peer.username !== user);
                 });
                 if(!$scope.$$phase)
                     $scope.$apply();
@@ -655,9 +654,8 @@
             };
 
             $scope.getUsers = function() {
-                if($scope.currentRoom === ""){
+                if($scope.currentRoom === "")
                     return;
-                }
                 Room.getUsers($scope.currentRoom)
                     .success(function(data) {
                         $scope.users[$scope.currentRoom] = data;
@@ -698,8 +696,7 @@
             rtc.log_heartbeat = false;
             rtc.log_event_source_message = true;
 
-            rtc
-            .on('error', function(error) {
+            rtc.on('error', function(error) {
                 log('[ERROR] ' + error);
             })
 
