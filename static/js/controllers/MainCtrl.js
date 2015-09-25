@@ -15,6 +15,8 @@
         $scope.currentUser = ''; $scope.currentRoom = ''; $scope.connectionStatus = 'Not Connected';
         var username, message, can_close, channel, peerConnections, error;
         var sound = new Audio(document.location.origin + '/static/vendor/Sound.wav');
+        var soundtwo = new Audio(document.location.origin + '/static/vendor/Sound2.wav');
+        var soundthree = new Audio(document.location.origin + '/static/vendor/Sound3.wav');
 
         navigator.getUserMedia({"video": true, "audio": true},
             function(stream){
@@ -306,6 +308,7 @@
                 channel.onmessage = function(message) {
                     rtc.fire('data_stream_data', username, message);
                     rtc.fire('message', username, message.data);
+                    soundthree.play();
                 };
 
                 channel.onerror = function(error) {
@@ -337,6 +340,7 @@
                     var username = rtc.usernames[x];
                     if(rtc.dataChannels[username] && rtc.dataChannels[username].readyState == 'open')
                         rtc.dataChannels[username].send(message);
+
                 }
                 rtc.fire('message', rtc.username, message.sanitize());
             };
@@ -517,6 +521,7 @@
             .on('user_join', function(data) {
                 toastr.info('User %0 has joined.'.f(data.username.bold()));
             })
+
             .on('message', function(username, message) {
                 message = { content: message, username: username };
                 var currentRoom = $scope.currentRoom;
@@ -566,6 +571,11 @@
                 $scope.joinRoom(room);
                 $('#createRoom').val('');
             });
+
+            $scope.buzz = function(){
+              console.log('hello');
+              soundtwo.play();
+            }
 
             $scope.getVideo = function(vidSrc) {
                 return $sce.trustAsResourceUrl(vidSrc);
