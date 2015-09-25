@@ -1,5 +1,4 @@
 /*global angular:false */
-
 (function(app) {
     app.factory('Room', function ($http) {
         return {

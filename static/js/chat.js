@@ -1,3 +1,4 @@
+/*global angular:false */
 (function (app) {
     app.run(function($rootScope) {
         $rootScope.messages = [];
