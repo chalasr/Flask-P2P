@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app='app'>
+<html data-ng-app='app'>
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -13,7 +13,7 @@
     <link rel="stylesheet" type="text/css" href="http://cdn.chalasdev.fr/css/toastr.min.css"/>
 </head>
 
-<body logservice ng-controller="MainController">
+<body logservice data-ng-controller="MainController">
 
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container">
@@ -29,22 +29,22 @@
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>
-                        <a ng-if="currentUser == ''" id="username">Anonymous</a>
-                        <a ng-if="currentUser != ''" id="username"><% currentUser %></a>
+                        <a data-ng-if="currentUser == ''" id="username">Anonymous</a>
+                        <a data-ng-if="currentUser != ''" id="username"><% currentUser %></a>
                     </li>
-                    <li class="dropdown" ng-init="getRooms()" ng-click="getRooms()">
+                    <li class="dropdown" data-ng-init="getRooms()" data-ng-click="getRooms()">
                         <a href="" class="dropdown-toggle" data-toggle="dropdown">Rooms<b class="caret"></b></a>
                         <ul id="roomsMenu" class="dropdown-menu">
-                            <ul class="column-dropdown" ng-repeat="room in rooms">
-                              <li class="joinRoom" data-room="<% room %>" ng-click="joinRoom(room)"><a><% room %></a></li>
+                            <ul class="column-dropdown" data-ng-repeat="room in rooms">
+                              <li class="joinRoom" data-room="<% room %>" data-ng-click="joinRoom(room)"><a><% room %></a></li>
                             </ul>
                         </ul>
                     </li>
 
-                    <li class="dropdown" ng-init="getUsers(room)" ng-click="getUsers(currentRoom)">
+                    <li class="dropdown" data-ng-init="getUsers(room)" data-ng-click="getUsers(currentRoom)">
                         <a href="" class="dropdown-toggle" data-toggle="dropdown">Users in room<b class="caret"></b></a>
                         <ul id="usersMenu" class="dropdown-menu">
-                            <ul class="column-dropdown" ng-repeat="user in users">
+                            <ul class="column-dropdown" data-ng-repeat="user in users">
                                 <li><a><% user %></a></li>
                             </ul>
                         </ul>
@@ -61,8 +61,8 @@
                 <ul class="nav navbar-nav navbar-right">
                     <li>
                         <span id="room_icon" class="fa fa-street-view" style="display:none"></span>
-                        <a ng-if="currentRoom == ''" id="room_name">Lobby</a>
-                        <a ng-if="currentRoom != ''" id="room_name"><% currentRoom %></a>
+                        <a data-ng-if="currentRoom == ''" id="room_name">Lobby</a>
+                        <a data-ng-if="currentRoom != ''" id="room_name"><% currentRoom %></a>
                     </li>
 
                     <li class="">
@@ -76,7 +76,7 @@
     <div class="container">
 
         <div class="col-md-6" id="messages">
-          <div ng-if="messages[currentRoom]" class="messages" ng-repeat="msg in messages[currentRoom]">
+          <div data-ng-if="messages[currentRoom]" class="messages" data-ng-repeat="msg in messages[currentRoom]">
               <span class="chat-user"><b><% msg.username %></b></span>
               <span class="fa fa-chevron-right"></span>
               <span class="message-inner"><% msg.content %></span>
@@ -85,8 +85,8 @@
 
         <div class="col-md-6 video-wrapper">
           <video id="localVideo" style="float:right;max-width:50%;border: solid 3px #90CA0A;" autoplay muted></video>
-          <video-player ng-repeat="peer in peers[currentRoom]">
-              <video autoplay style="float:right;max-width:50%;" id="<% peer.username %>" ng-src="<% getVideo(peer.stream) %>"></video>
+          <video-player data-ng-repeat="peer in peers[currentRoom]">
+              <video autoplay style="float:right;max-width:50%;" id="<% peer.username %>" data-ng-src="<% getVideo(peer.stream) %>"></video>
           </video-player>
         </div>
 
@@ -106,8 +106,8 @@
           </div>
           <div class="modal-body">
             <div>
-              <form ng-submit="login()">
-                <input autofocus ng-model="currentUser" id="login" type="text" class="form-control" placeholder="Set your nickname" />
+              <form data-ng-submit="login()">
+                <input autofocus data-ng-model="currentUser" id="login" type="text" class="form-control" placeholder="Set your nickname" />
                 <br>
                 <span class="input-group-btn">
                 <button class="btn btn-primary btn-sm" id="btn-chat">Go</button>
