@@ -1,8 +1,7 @@
-
 //Exception ie8 trycatch
 /*jshint -W002 */
 
-//Vendors
+//Vendors ($, angular, toastr, SSE)
 /*global EventSource:false */
 /*global $:false */
 /*global angular:false */
@@ -581,9 +580,9 @@
             });
 
             $scope.buzz = function(){
-              console.log('hello');
-              soundtwo.play();
-            }
+              	console.log('hello');
+              	soundtwo.play();
+            };
 
             $scope.getVideo = function(vidSrc) {
                 return $sce.trustAsResourceUrl(vidSrc);
