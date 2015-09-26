@@ -1,4 +1,4 @@
-# Cheesy P2P
+# Flask P2P
 
 Multi-rooms WebRTC P2P messaging web app, containing a light server written in Python that provides web services for AngularJS module.
 
