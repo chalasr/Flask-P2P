@@ -13,10 +13,15 @@ Multi-rooms WebRTC P2P messaging web app, containing a light server written in P
 - Python >= 2.7
 - Browser support for WebRTC
 
+## Installation
+
+- Clone repository `git clone https://github.com/chalasr/PythonBahamas`
+- Install vendors  `pip install -r requirements.txt`
+- Run application `python app.py`
+- Browse on `localhost:5000`
 ## CREDITS
 
-[@chalasr](https://github.com/chalasr)
-
+[@chalasr](https://github.com/chalasr) - 
 [@martinlavanant](https://github.com/martinlavanant)
 
 ## LICENSE

@@ -8,7 +8,7 @@
 /*global toastr:false */
 
 (function(app) {
-    app.controller('MainController', function ($sce, $scope, Room) {
+    app.controller('MainController', function ($sce, $scope, $log, $filter, Room) {
 
         $scope.peers = []; $scope.roomUsers = []; $scope.rooms = []; $scope.messages = []; $scope.users = [];
         $scope.currentUser = ''; $scope.currentRoom = ''; $scope.connectionStatus = 'Not Connected';
@@ -30,7 +30,6 @@
          * WebRTC Service
          * @return {Object} RTC
          */
-        (function() {
             (function(strings, regex) {
                 //Parse string
                 strings.f = function () {
@@ -62,6 +61,8 @@
                         var sanitize_replace = {
                             '<' : '&lt;',
                             '>' : '&gt;',
+                            "'" : '&quot;',
+                            "'" : '&#x27;',
                             '/' : '&#x2F;'
                         };
                         return sanitize_replace[c];
@@ -166,8 +167,8 @@
                 rtc.fire('new_peer_connection', username, config);
 
                 pc.onicecandidate = function(event) {
-                    if (!event.candidate || event.candidate === null) return;
-
+                    if (!event.candidate || event.candidate === null)
+                        return;
                     rtc.emit('send_ice_candidate', {
                         label: event.candidate.label,
                         candidate: JSON.stringify(event.candidate),
@@ -605,6 +606,7 @@
             };
 
             $scope.addPeer = function(stream, username) {
+                $scope.getUsers();
                 if(!$scope.peers[$scope.currentRoom]) {
                     $scope.peers[$scope.currentRoom] = [];
                 }
@@ -626,6 +628,7 @@
             };
 
             $scope.removePeer = function(user) {
+                $scope.getUsers();
                 if(!$scope.peers[$scope.currentRoom]) {
                     $scope.peers[$scope.currentRoom] = [];
                 }
@@ -634,6 +637,7 @@
                 });
                 if(count.length > 0) {
                     toastr.info('%0.'.f(user.bold()) + ' has leave room');
+                    $scope.messages[$scope.currentRoom] = $scope.messages[$scope.currentRoom] ? $scope.messages[$scope.currentRoom] : [];
                     $scope.messages[$scope.currentRoom].push({username: '' , content: user + ' has leave room' , type: 'info'});
                 }
                 $scope.peers[$scope.currentRoom] = $scope.peers[$scope.currentRoom].filter(function(peer) {
@@ -672,6 +676,10 @@
                     });
             };
 
+            $scope.getTime = function(){
+                return $filter('date')(new Date(), 'HH:mm:ss');
+            };
+
             window.rtc = rtc;
             rtc.connect(document.location.origin + '/stream');
 
@@ -680,15 +688,21 @@
              * @param  {Object} rtc
              */
 
-            var pad0 = function(number) { return number < 10 ? '0' + number : number; };
             var log = function() {
-                var args = Array.prototype.slice.call(arguments, 0);
-                var date = new Date();
-                args.unshift('%0:%1:%2'.f(
-                    pad0(date.getHours()),
-                    pad0(date.getMinutes()),
-                    pad0(date.getSeconds())));
-                console.log.apply(console, args);
+                var params = Array.prototype.slice.call(arguments, 0);
+                var type = params[0];
+                var args = params.slice(1);
+                args.unshift($scope.getTime());
+                switch(type) {
+                  case 'info':
+                      $log.info.apply(console, args);
+                      break;
+                  case 'warning':
+                      $log.warning.apply(console, args);
+                      break;
+                  default:
+                      $log.log.apply(console, args);
+                }
                 return log;
             };
 
@@ -697,111 +711,109 @@
             rtc.log_event_source_message = true;
 
             rtc.on('error', function(error) {
-                log('[ERROR] ' + error);
+                log('warning', '[ERROR] ' + error);
             })
 
             // EventSource
             .on('connect', function(stream_url) {
-                log('Connected to ' + stream_url);
+                log('log', 'Connected to ' + stream_url);
             })
             .on('connecting', function(stream_url) {
-                log('Connecting to ' + stream_url);
+                log('log', 'Connecting to ' + stream_url);
             })
             .on('disconnect', function(stream_url) {
-                log('Disconnected from ' + stream_url);
+                log('log', 'Disconnected from ' + stream_url);
             })
             .on('event_source_error', function(event) {
-                log('Event source error', event);
+                log('warning', 'Event source error', event);
             })
             .on('event_source_message', function(event) {
                 var data = JSON.parse(event.data);
                 if ((data.event === 'heartbeat' && !rtc.log_heartbeat) ||
                     !rtc.log_event_source_message)
                     return;
-                log('Event source message', event);
+                log('log', 'Event source message', event);
             })
             .on('hello', function() {
-                log('Got hello packet!');
+                log('log', 'Got hello packet!');
             })
 
             // WebRTC Events
             .on('new_peer_connection', function(username, config) {
-                log('new PeerConnection for ' + username, config);
+                log('info', 'new PeerConnection for ' + username, config);
             })
             .on('ice_candidate', function(username, candidate, event) {
-                log('ICE Candidate ' + username, candidate, event);
+                log('info','ICE Candidate ' + username, candidate, event);
             })
             .on('peer_connection_opened', function(username) {
-                log('PeerConnection opened for ' + username);
+                log('info', 'PeerConnection opened for ' + username);
             })
-            .on('ice_state_chjange', function(event) {
-                log('new ICE state: ' + event.target.iceConnectionState, event);
+            .on('ice_state_change', function(event) {
+                log('info', 'new ICE state: ' + event.target.iceConnectionState, event);
             })
             .on('add_data_channel', function(username, event) {
-                log('Added Data Channel for ' + username, event);
+                log('info', 'Added Data Channel for ' + username, event);
             })
             .on('pc_error', function(username, event) {
-                log('Peer connection error with ' + username, event);
+                log('warning', 'Peer connection error with ' + username, event);
             })
             .on('set_local_description', function(username) {
-                log('Set LocalDescription for ' + username);
+                log('log', 'Set LocalDescription for ' + username);
             })
             .on('set_local_description_error', function() {
-                log('Set LocalDescription error with ');
+                log('warning', 'Set LocalDescription error with ');
             })
             .on('send_offer', function(username) {
-                log('Sent PC offer to ' + username);
+                log('log', 'Sent PC offer to ' + username);
             })
             .on('send_offer_error', function(username, error) {
-                log('PC offer error with ' + username, error);
+                log('warning', 'PC offer error with ' + username, error);
             })
             .on('receive_offer', function(username, sdp) {
-                log('received PC offer from ' + username, sdp);
+                log('log', 'received PC offer from ' + username, sdp);
             })
             .on('receive_answer', function(username, sdp_in) {
-                log('received PC answer from ' + username, sdp_in);
+                log('log', 'received PC answer from ' + username, sdp_in);
             })
             .on('set_remote_description', function(username) {
-                log('Set RemoteDescription for '+ username);
+                log('info', 'Set RemoteDescription for '+ username);
             })
             .on('set_remote_description_error', function(username, error) {
-                log('RemoteDescription error with ' + username, error);
+                log('warning', 'RemoteDescription error with ' + username, error);
             })
             .on('data_channel_added', function(username, label) {
-                log('added DataChannel with %0 labeled "%1"'.f(username, label));
+                log('info', 'added DataChannel with %0 labeled "%1"'.f(username, label));
             })
             .on('data_channel_error', function(username, error) {
-                log('DataChannel error with %0: %1'.f(username, error));
+                log('warning', 'DataChannel error with %0: %1'.f(username, error));
             })
             .on('data_stream_open', function(username) {
-                log('DataChannel opened for ' + username);
+                log('info', 'DataChannel opened for ' + username);
             })
             .on('data_stream_close', function(username) {
-                log('DataStream closed for ' + username);
+                log('info', 'DataStream closed for ' + username);
             })
             .on('data_stream_data', function(username, message) {
                 if (rtc.log_data_stream_data)
-                    log('received from %0: %1'.f(username, message));
+                    log('log', 'received data from %0: %1'.f(username, message));
             })
             .on('data_channel_reliable', function() {
-                log('Data channel reliability set to ');
+                log('info', 'Data channel reliability set to ');
             })
             .on('get_peers', function(data) {
-                log('get_peers', data);
+                log('log', 'get_peers', data);
             })
             .on('joined_room', function(room) {
-                log('joined room: ' + room);
+                log('info', 'joined room: ' + room);
             })
             .on('user_join', function(data) {
-                log(data.username + ' has joined the room');
+                log('info', data.username + ' has joined the room');
             })
             .on('set_username_success', function(username) {
-                log('successfuly set username to ' + username);
+                log('log', 'successfuly set username to ' + username);
             })
             .on('set_username_error', function(username) {
-                log('failed to set username to ' + username);
+                log('warning', 'failed to set username to ' + username);
             });
-
-        })();
     });
 })(angular.module('MainCtrl', []));
