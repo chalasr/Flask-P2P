@@ -10,8 +10,8 @@
 (function(app) {
     app.controller('MainController', function ($sce, $scope, $log, $filter, Room) {
 
-        $scope.peers = []; $scope.roomUsers = []; $scope.rooms = []; $scope.messages = []; $scope.users = [];
-        $scope.currentUser = ''; $scope.currentRoom = ''; $scope.connectionStatus = 'Not Connected';
+        $scope.peers = []; $scope.roomUsers = []; $scope.rooms = []; $scope.messages = []; $scope.users = []; $scope.messages['Lobby'] = [];
+        $scope.currentUser = ''; $scope.currentRoom = 'Lobby'; $scope.connectionStatus = 'Not Connected';
         var username, message, can_close, channel, peerConnections, error;
         var sound = new Audio(document.location.origin + '/static/vendor/Sound.wav');
         var soundtwo = new Audio(document.location.origin + '/static/vendor/Sound2.wav');
@@ -360,7 +360,8 @@
                            rtc.room = room;
                            $scope.getRooms();
                            $scope.currentRoom = room;
-                           $scope.getUsers(room);
+                           $scope.getUsers();
+                           $scope.messages[$scope.currentRoom] = [];
                             rtc.fire('joined_room', room)
                                .fire('get_peers', json);
                         });
@@ -522,15 +523,18 @@
             .on('user_join', function(data) {
                 toastr.info('User %0 has joined.'.f(data.username.bold()));
             })
-
             .on('message', function(username, message) {
                 $scope.getUsers();
-                message = { content: message, username: username };
+                message = { content: message, username: username, time: $scope.getTime() };
                 var currentRoom = $scope.currentRoom;
-                $scope.messages[currentRoom] = $scope.messages[currentRoom] ? $scope.messages[currentRoom] : [];
-                $scope.users[currentRoom] = $scope.users[currentRoom] ? $scope.users[currentRoom] : [];
-                var count = $scope.users[$scope.currentRoom].filter(function(user){
-                   return (user == username);
+                if(currentRoom === 'Lobby') {
+                    $scope.messages[currentRoom].push(message);
+                    if(!$scope.$$phase)
+                        $scope.$apply();
+                    return;
+                }
+                var count = $scope.users[$scope.currentRoom].filter(function(user) {
+                    return (user == username);
                 });
                 if(count.length > 0){
                     $scope.messages[currentRoom].push(message);
@@ -583,7 +587,6 @@
             });
 
             $scope.buzz = function(){
-              	console.log('hello');
               	soundtwo.play();
             };
 
@@ -633,15 +636,14 @@
                     $scope.peers[$scope.currentRoom] = [];
                 }
                 var count = $scope.peers[$scope.currentRoom].filter(function(peer) {
-                   return (peer.username == user);
+                    return (peer.username == user);
                 });
                 if(count.length > 0) {
                     toastr.info('%0.'.f(user.bold()) + ' has leave room');
-                    $scope.messages[$scope.currentRoom] = $scope.messages[$scope.currentRoom] ? $scope.messages[$scope.currentRoom] : [];
                     $scope.messages[$scope.currentRoom].push({username: '' , content: user + ' has leave room' , type: 'info'});
                 }
                 $scope.peers[$scope.currentRoom] = $scope.peers[$scope.currentRoom].filter(function(peer) {
-                   return (peer.username !== user);
+                    return (peer.username !== user);
                 });
                 if(!$scope.$$phase)
                     $scope.$apply();
@@ -649,31 +651,31 @@
 
             $scope.getRooms = function() {
                 Room.getRooms()
-                  .success(function(data) {
-                      $scope.rooms = data;
-                  })
-                  .error(function(data) {
-                      console.log(data);
-                  });
+                .success(function(data) {
+                    $scope.rooms = data;
+                })
+                .error(function(data) {
+                    console.log(data);
+                });
             };
 
             $scope.getUsers = function() {
                 if($scope.currentRoom === "")
                     return;
                 Room.getUsers($scope.currentRoom)
-                    .success(function(data) {
-                        $scope.users[$scope.currentRoom] = data;
-                    })
-                    .error(function(data) {
-                        console.log(data);
-                    });
+                .success(function(data) {
+                    $scope.users[$scope.currentRoom] = data;
+                })
+                .error(function(data) {
+                    console.log(data);
+                });
             };
 
             $scope.leaveOtherRooms = function(wantedRoom) {
                 Room.leaveRooms(wantedRoom, $scope.currentUser)
-                    .error(function(data) {
-												console.log(data);
-                    });
+                .error(function(data) {
+										console.log(data);
+                });
             };
 
             $scope.getTime = function(){
@@ -687,22 +689,13 @@
              * Log service
              * @param  {Object} rtc
              */
-
             var log = function() {
                 var params = Array.prototype.slice.call(arguments, 0);
                 var type = params[0];
                 var args = params.slice(1);
                 args.unshift($scope.getTime());
-                switch(type) {
-                  case 'info':
-                      $log.info.apply(console, args);
-                      break;
-                  case 'warning':
-                      $log.warning.apply(console, args);
-                      break;
-                  default:
-                      $log.log.apply(console, args);
-                }
+                var toExec = "$log."+ type + ".apply(console, args)";
+                eval(toExec);
                 return log;
             };
 
@@ -725,7 +718,7 @@
                 log('log', 'Disconnected from ' + stream_url);
             })
             .on('event_source_error', function(event) {
-                log('warning', 'Event source error', event);
+                log('warn', 'Event source error', event);
             })
             .on('event_source_message', function(event) {
                 var data = JSON.parse(event.data);
@@ -755,19 +748,19 @@
                 log('info', 'Added Data Channel for ' + username, event);
             })
             .on('pc_error', function(username, event) {
-                log('warning', 'Peer connection error with ' + username, event);
+                log('warn', 'Peer connection error with ' + username, event);
             })
             .on('set_local_description', function(username) {
                 log('log', 'Set LocalDescription for ' + username);
             })
             .on('set_local_description_error', function() {
-                log('warning', 'Set LocalDescription error with ');
+                log('warn', 'Set LocalDescription error with ');
             })
             .on('send_offer', function(username) {
                 log('log', 'Sent PC offer to ' + username);
             })
             .on('send_offer_error', function(username, error) {
-                log('warning', 'PC offer error with ' + username, error);
+                log('warn', 'PC offer error with ' + username, error);
             })
             .on('receive_offer', function(username, sdp) {
                 log('log', 'received PC offer from ' + username, sdp);
@@ -779,13 +772,13 @@
                 log('info', 'Set RemoteDescription for '+ username);
             })
             .on('set_remote_description_error', function(username, error) {
-                log('warning', 'RemoteDescription error with ' + username, error);
+                log('warn', 'RemoteDescription error with ' + username, error);
             })
             .on('data_channel_added', function(username, label) {
                 log('info', 'added DataChannel with %0 labeled "%1"'.f(username, label));
             })
             .on('data_channel_error', function(username, error) {
-                log('warning', 'DataChannel error with %0: %1'.f(username, error));
+                log('warn', 'DataChannel error with %0: %1'.f(username, error));
             })
             .on('data_stream_open', function(username) {
                 log('info', 'DataChannel opened for ' + username);
@@ -813,7 +806,7 @@
                 log('log', 'successfuly set username to ' + username);
             })
             .on('set_username_error', function(username) {
-                log('warning', 'failed to set username to ' + username);
+                log('warn', 'failed to set username to ' + username);
             });
     });
 })(angular.module('MainCtrl', []));

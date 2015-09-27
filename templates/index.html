@@ -8,6 +8,7 @@
 
     <title>Python</title>
     <link rel="stylesheet" type="text/css" href="static/vendor/css/bootstrap.min.css" />
+    <link rel="icon" href="static/favicon.png" />
     <link rel="stylesheet" type="text/css" href="static/vendor/css/style.css" />
     <link rel="stylesheet" type="text/css" href="static/vendor/fontawesome/css/font-awesome.css"/>
     <link rel="stylesheet" type="text/css" href="http://cdn.chalasdev.fr/css/toastr.min.css"/>
@@ -36,7 +37,7 @@
                         <a href="" class="dropdown-toggle" data-toggle="dropdown">Rooms<b class="caret"></b></a>
                         <ul id="roomsMenu" class="dropdown-menu">
                             <li class="column-dropdown" data-ng-repeat="room in rooms">
-                              <a class="joinRoom" data-room="<% room %>" data-ng-click="joinRoom(room)"><% room %></a>
+                              <a data-ng-if="room != 'Lobby'" class="joinRoom" data-room="<% room %>" data-ng-click="joinRoom(room)"><% room %></a>
                             </li>
                         </ul>
                     </li>
@@ -77,7 +78,8 @@
 
         <div class="col-md-6" id="messages">
           <div data-ng-if="messages[currentRoom]" class="messages" data-ng-repeat="msg in messages[currentRoom]">
-              <span data-ng-if="!msg.type" class="chat-user"><b><% msg.username %></b></span>
+              <span class="chat-user"><i class="fa fa-clock-o"></i><b><% msg.time %></b></span>
+              <span data-ng-if="!msg.type" style="color: #90CA0A!important" class="chat-user"><b><% msg.username %></b></span>
               <span data-ng-if="!msg.type" class="fa fa-chevron-right"></span>
               <span data-ng-if="!msg.type" class="message-inner"><% msg.content %></span>
               <span data-ng-if="msg.type" class="message-inner info"><% msg.content %></span>
