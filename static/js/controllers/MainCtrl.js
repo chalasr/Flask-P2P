@@ -4,7 +4,7 @@
      * @return {Object} RTC
      */
      function MainCtrl($sce, Room) {
-        var vm = MainCtrl.prototype;
+        var vm = MainCtrl.prototype = this;
         vm.peers = []; vm.roomUsers = []; vm.rooms = []; vm.messages = []; vm.users = []; vm.messages['Lobby'] = [];
         vm.currentUser = ''; vm.currentRoom = 'Lobby'; vm.connectionStatus = 'Not Connected';
         var username, message, can_close, channel, peerConnections, error;
@@ -23,7 +23,7 @@
         };
 
         vm.login = function() {
-            var nick = $.trim(vm.currentUser);
+            var nick = $.trim(vm.currentUser)
             if(nick.length < 3) {
                 toastr.warning('Your nickname must take 3 characters minimum');
                 return;
@@ -630,7 +630,7 @@
             $('#createRoom').val('');
         });
 
-        window.rtc = rtc;
+        window.rtc = MainCtrl.prototype.rtc = rtc;
         rtc.connect(document.location.origin + '/stream');
         console.log(MainCtrl.prototype);
 
