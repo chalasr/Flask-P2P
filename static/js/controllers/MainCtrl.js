@@ -1,4 +1,5 @@
 (function(app) {
+
     /**
      * WebRTC Service
      * @return {Object} RTC
@@ -6,7 +7,7 @@
      function MainCtrl($sce, Room) {
         var vm = MainCtrl.prototype = this;
         vm.peers = []; vm.roomUsers = []; vm.rooms = []; vm.messages = []; vm.users = []; vm.messages['Lobby'] = [];
-        vm.currentUser = ''; vm.currentRoom = 'Lobby'; vm.connectionStatus = 'Not Connected';
+        vm.currentRoom = 'Lobby'; vm.connectionStatus = 'Not Connected';
         var username, message, can_close, channel, peerConnections, error;
         var sound = new Audio(document.location.origin + '/static/vendor/Sound.wav');
         var soundtwo = new Audio(document.location.origin + '/static/vendor/Sound2.wav');
@@ -23,7 +24,7 @@
         };
 
         vm.login = function() {
-            var nick = $.trim(vm.currentUser)
+            var nick = $.trim(vm.rtc.username)
             if(nick.length < 3) {
                 toastr.warning('Your nickname must take 3 characters minimum');
                 return;
@@ -32,11 +33,11 @@
                 toastr.warning('Your nickname contains illegal characters, please change it');
                 return;
             }
-            rtc.set_username(vm.currentUser);
+            vm.rtc.set_username(vm.rtc.username);
         };
 
         vm.joinRoom = function(room) {
-            rtc.join_room(room);
+            vm.rtc.join_room(room);
         };
 
         vm.addPeer = function(stream, username) {
@@ -103,7 +104,7 @@
         };
 
         vm.leaveOtherRooms = function(wantedRoom) {
-            Room.leaveRooms(wantedRoom, vm.currentUser)
+            Room.leaveRooms(wantedRoom, vm.rtc.username)
             .error(function(data) {
 					      console.log(data);
             });
@@ -128,7 +129,7 @@
         var rtc_unsupported = 0;
         var reliable_false  = 1;
         var reliable_true   = 2;
-        var rtc = {
+        vm.rtc = {
             STUN_SERVERS: {
                 iceServers: [{ url: 'stun:stun.l.google.com:19302' } ]
             },
@@ -143,100 +144,100 @@
             usernames: []
         };
 
-        rtc.on = function(event, callback) {
+        vm.rtc.on = function(event, callback) {
             var events = event.split(' ');
             for (var x = 0; x < events.length; x++) {
                 if (events[x].length === 0)
                     continue;
-                rtc._events[events[x]] = rtc._events[events[x]] || [];
-                rtc._events[events[x]].push(callback);
+                vm.rtc._events[events[x]] = vm.rtc._events[events[x]] || [];
+                vm.rtc._events[events[x]].push(callback);
             }
             return this;
         };
 
-        rtc.fire = function(event) {
+        vm.rtc.fire = function(event) {
             var events = event.split(' ');
             var args = Array.prototype.slice.call(arguments, 1);
             for (var x = 0; x < events.length; x++) {
-                var callbacks = rtc._events[events[x]] || [];
+                var callbacks = vm.rtc._events[events[x]] || [];
                 for(var y = 0; y < callbacks.length; y++)
                     callbacks[y].apply(null, args);
             }
             return this;
         };
 
-        rtc.connect = function(stream_url) {
+        vm.rtc.connect = function(stream_url) {
 
-            rtc.stream = new EventSource(stream_url);
-            rtc.stream_url = stream_url;
-            rtc.fire('connecting');
+            vm.rtc.stream = new EventSource(stream_url);
+            vm.rtc.stream_url = stream_url;
+            vm.rtc.fire('connecting');
 
-            rtc.stream.onmessage = function(event) {
+            vm.rtc.stream.onmessage = function(event) {
                 var data = JSON.parse(event.data);
-                rtc.fire('event_source_message', event);
-                rtc.fire(data.event, data);
+                vm.rtc.fire('event_source_message', event);
+                vm.rtc.fire(data.event, data);
             };
 
-            rtc.stream.onopen = function(event) {
-                if (rtc.stream.readyState == 1) {
-                    rtc.connected = true;
-                    rtc.fire('connect', stream_url, event);
+            vm.rtc.stream.onopen = function(event) {
+                if (vm.rtc.stream.readyState == 1) {
+                    vm.rtc.connected = true;
+                    vm.rtc.fire('connect', stream_url, event);
                 }
             };
 
-            rtc.stream.onerror = function(event) {
-                if (rtc.stream.readyState != 1 && rtc.connected) {
-                    rtc.connected = false;
-                    if(rtc.dataChannels[username])
-                        rtc.dataChannels[username].send(message);
+            vm.rtc.stream.onerror = function(event) {
+                if (vm.rtc.stream.readyState != 1 && vm.rtc.connected) {
+                    vm.rtc.connected = false;
+                    if(vm.rtc.dataChannels[username])
+                        vm.rtc.dataChannels[username].send(message);
                 }
-                rtc.fire('event_source_error', stream_url, event);
+                vm.rtc.fire('event_source_error', stream_url, event);
             };
         };
 
-        rtc.emit = function(event, data) {
+        vm.rtc.emit = function(event, data) {
             var type = typeof data === 'string' ? data : 'post';
             return $.ajax({
                 url: '%0/%1'.f(document.location.origin, event),
                 data: data,
                 dataType: 'json',
                 type: type,
-                headers: { "X-Stream-ID": rtc.stream_id }
+                headers: { "X-Stream-ID": vm.rtc.stream_id }
             });
         };
 
-        rtc.create_peer_connection = function(username) {
+        vm.rtc.create_peer_connection = function(username) {
             var config;
-            if (rtc.dataChannelSupport != rtc_unsupported) {
-                config = rtc.dataChannelConfig;
+            if (vm.rtc.dataChannelSupport != rtc_unsupported) {
+                config = vm.rtc.dataChannelConfig;
             }
-            var pc = rtc.peerConnections[username] = new PeerConnection(rtc.STUN_SERVERS, config);
-            rtc.fire('new_peer_connection', username, config);
+            var pc = vm.rtc.peerConnections[username] = new PeerConnection(vm.rtc.STUN_SERVERS, config);
+            vm.rtc.fire('new_peer_connection', username, config);
 
             pc.onicecandidate = function(event) {
                 if (!event.candidate || event.candidate === null)
                     return;
-                rtc.emit('send_ice_candidate', {
+                vm.rtc.emit('send_ice_candidate', {
                     label: event.candidate.label,
                     candidate: JSON.stringify(event.candidate),
                     username: username
                 });
 
-                rtc.fire('ice_candidate', username, event.candidate, event);
+                vm.rtc.fire('ice_candidate', username, event.candidate, event);
                 pc.onicecandidate = null;
             };
 
             pc.onopen = function() {
-                rtc.fire('peer_connection_opened', username);
+                vm.rtc.fire('peer_connection_opened', username);
             };
 
             pc.onaddstream = function(event) {
-                rtc.fire('add_remote_stream', username,  event.stream);
+                vm.rtc.fire('add_remote_stream', username,  event.stream);
                 vm.addPeer(event.stream, username);
             };
 
             pc.onremovestream = function(event) {
-                rtc.fire('remove_peer_connected', username, event.stream);
+                vm.rtc.fire('remove_peer_connected', username, event.stream);
             };
 
             pc.oniceconnectionstatechange = function(event) {
@@ -245,9 +246,9 @@
                 }
                 if (event.target.iceConnectionState == 'disconnected') {
                     vm.removePeer(username);
-                    rtc.fire('data_stream_close', username, channel);
+                    vm.rtc.fire('data_stream_close', username, channel);
                 }
-                rtc.fire('ice_state_change', event);
+                vm.rtc.fire('ice_state_change', event);
             };
 
             // (function() {
@@ -255,202 +256,202 @@
             // });
 
             pc.ondatachannel = function (event) {
-                rtc.add_data_channel(username, event.channel);
-                rtc.fire('add_data_channel', username, event);
+                vm.rtc.add_data_channel(username, event.channel);
+                vm.rtc.fire('add_data_channel', username, event);
             };
 
             pc.onidpassertionerror = pc.onidpvalidationerror = function(e) {
-                rtc.fire('pc_error', username, e);
+                vm.rtc.fire('pc_error', username, e);
             };
             return pc;
         };
 
-        rtc.send_offer = function(username) {
-            var pc = rtc.peerConnections[username];
+        vm.rtc.send_offer = function(username) {
+            var pc = vm.rtc.peerConnections[username];
             pc.createOffer( function(session_description) {
                 pc.setLocalDescription(session_description, function() {
-                    rtc.fire('set_local_description', username);
+                    vm.rtc.fire('set_local_description', username);
                 }, function(error) {
-                    rtc.fire('set_local_description_error', username, error);
+                    vm.rtc.fire('set_local_description_error', username, error);
                 });
 
-                rtc.emit('send_offer', {
+                vm.rtc.emit('send_offer', {
                     username: username,
                         sdp: JSON.stringify(session_description)
                 });
-                rtc.fire('send_offer', username);
+                vm.rtc.fire('send_offer', username);
             }, function(error) {
-                rtc.fire('send_offer_error', username, error);
+                vm.rtc.fire('send_offer_error', username, error);
             });
         };
 
-        rtc.receive_offer = function(username, sdp) {
-            var pc = rtc.peerConnections[username];
+        vm.rtc.receive_offer = function(username, sdp) {
+            var pc = vm.rtc.peerConnections[username];
             var sdp_reply = new SessionDescription(JSON.parse(sdp));
             pc.setRemoteDescription(sdp_reply, function () {
-                rtc.send_answer(username);
-                rtc.fire('set_remote_description', username);
+                vm.rtc.send_answer(username);
+                vm.rtc.fire('set_remote_description', username);
             },function(error){
-                rtc.fire('set_remote_description_error', username, error);
+                vm.rtc.fire('set_remote_description_error', username, error);
             });
         };
 
-        rtc.send_answer = function(username) {
-            var pc = rtc.peerConnections[username];
+        vm.rtc.send_answer = function(username) {
+            var pc = vm.rtc.peerConnections[username];
             pc.createAnswer(function(session_description) {
-                rtc.fire('send_offer', username);
+                vm.rtc.fire('send_offer', username);
                 pc.setLocalDescription(session_description, function() {
-                    rtc.emit('send_answer',{
+                    vm.rtc.emit('send_answer',{
                         username: username,
                         sdp: JSON.stringify(session_description)
                     });
-                    rtc.fire('set_local_description', username);
+                    vm.rtc.fire('set_local_description', username);
                 },function(error) {
-                    rtc.fire('set_local_description_error', username, error);
+                    vm.rtc.fire('set_local_description_error', username, error);
                 });
             }, function() {
-                rtc.fire('send_offer_error'. username, error);
+                vm.rtc.fire('send_offer_error'. username, error);
             });
         };
 
-        rtc.receive_answer = function(username, sdp_in) {
-            var pc = rtc.peerConnections[username];
+        vm.rtc.receive_answer = function(username, sdp_in) {
+            var pc = vm.rtc.peerConnections[username];
             var sdp = new SessionDescription(JSON.parse(sdp_in));
             pc.setRemoteDescription(sdp, function() {
-                rtc.fire('set_remote_description', username);
+                vm.rtc.fire('set_remote_description', username);
             },function() {
-                rtc.fire('set_remote_description_error', username);
+                vm.rtc.fire('set_remote_description_error', username);
             });
         };
 
-        rtc.create_data_channel = function(username, label) {
-            var pc = rtc.peerConnections[username];
+        vm.rtc.create_data_channel = function(username, label) {
+            var pc = vm.rtc.peerConnections[username];
             label = label || String(username);
-            if (rtc.dataChannelSupport == reliable_false) {
+            if (vm.rtc.dataChannelSupport == reliable_false) {
                 return;
             }
             try {
                 channel = pc.createDataChannel(label, { reliable: true });
             } catch (error) {
-                rtc.fire('data_channel_error', username, error);
+                vm.rtc.fire('data_channel_error', username, error);
                 throw error;
             }
-            return rtc.add_data_channel(username, channel);
+            return vm.rtc.add_data_channel(username, channel);
         };
 
-        rtc.add_data_channel = function(username, channel) {
+        vm.rtc.add_data_channel = function(username, channel) {
             channel.onopen = function() {
                 channel.binaryType = 'arraybuffer';
-                rtc.connected[username] = true;
-                rtc.fire('data_stream_open', username);
+                vm.rtc.connected[username] = true;
+                vm.rtc.fire('data_stream_open', username);
                 vm.getUsers();
             };
 
             channel.onclose = function(event) {
 								event = event;
-              	delete rtc.dataChannels[username];
+              	delete vm.rtc.dataChannels[username];
                 vm.removePeer(username);
-                rtc.fire('data_stream_close', username, channel);
+                vm.rtc.fire('data_stream_close', username, channel);
             };
 
             channel.onmessage = function(message) {
-                rtc.fire('data_stream_data', username, message);
-                rtc.fire('message', username, message.data);
+                vm.rtc.fire('data_stream_data', username, message);
+                vm.rtc.fire('message', username, message.data);
             };
 
             channel.onerror = function(error) {
-                rtc.fire('data_stream_error', username, error);
+                vm.rtc.fire('data_stream_error', username, error);
             };
 
-            rtc.dataChannels[username] = channel;
-            rtc.fire('data_channel_added', username);
+            vm.rtc.dataChannels[username] = channel;
+            vm.rtc.fire('data_channel_added', username);
             return channel;
         };
 
-        rtc.add_streams = function() {
-            for (var i = 0; i < rtc.streams.length; i++) {
-                var stream = rtc.streams[i];
-              	for (var connection in rtc.peerConnections) {
-                  	if (rtc.hasOwnProperty(peerConnections)) {
-               		  		rtc.peerConnections[connection].addStream(stream);
+        vm.rtc.add_streams = function() {
+            for (var i = 0; i < vm.rtc.streams.length; i++) {
+                var stream = vm.rtc.streams[i];
+              	for (var connection in vm.rtc.peerConnections) {
+                  	if (vm.rtc.hasOwnProperty(peerConnections)) {
+               		  		vm.rtc.peerConnections[connection].addStream(stream);
                     }
                 }
             }
         };
 
-        rtc.attach_stream = function(stream, dom_id) {
+        vm.rtc.attach_stream = function(stream, dom_id) {
             document.getElementById(dom_id).src = window.URL.createObjectURL(stream);
         };
 
-        rtc.send = function(message) {
-            for (var x = 0; x < rtc.usernames.length; x++) {
-                var username = rtc.usernames[x];
-                if(rtc.dataChannels[username] && rtc.dataChannels[username].readyState == 'open')
-                    rtc.dataChannels[username].send(message);
+        vm.rtc.send = function(message) {
+            for (var x = 0; x < vm.rtc.usernames.length; x++) {
+                var username = vm.rtc.usernames[x];
+                if(vm.rtc.dataChannels[username] && vm.rtc.dataChannels[username].readyState == 'open')
+                    vm.rtc.dataChannels[username].send(message);
 
             }
-            rtc.fire('message', rtc.username, message.sanitize());
+            vm.rtc.fire('message', vm.rtc.username, message.sanitize());
         };
 
-        rtc.join_room = function(room) {
+        vm.rtc.join_room = function(room) {
             if(vm.currentRoom !== ''){
-                if(room == rtc.room || room == vm.currentRoom) {
+                if(room == vm.rtc.room || room == vm.currentRoom) {
                     return toastr.warning('You are already in this room');
                 }
                 vm.leaveOtherRooms(room);
             }
-            if (rtc.connected)
-                rtc.emit('join_room', { room: room, encryption: null })
+            if (vm.rtc.connected)
+                vm.rtc.emit('join_room', { room: room, encryption: null })
                     .done(function(json) {
                        sound.play();
-                       rtc.room = room;
+                       vm.rtc.room = room;
                        vm.getRooms();
                        vm.currentRoom = room;
                        vm.getUsers();
                        vm.messages[vm.currentRoom] = [];
-                        rtc.fire('joined_room', room)
+                        vm.rtc.fire('joined_room', room)
                            .fire('get_peers', json);
                     });
         };
 
-        rtc.set_username = function(username) {
-            if (rtc.connected) {
-                rtc.emit('set_username', { username: username })
+        vm.rtc.set_username = function(username) {
+            if (vm.rtc.connected) {
+                vm.rtc.emit('set_username', { username: username })
                     .done(function() {
-                        rtc.username = username;
-                        rtc.fire('set_username_success', username);
+                        vm.rtc.username = username;
+                        vm.rtc.fire('set_username_success', username);
                         setTimeout(function () {
                           $('#myModal').modal('hide');
                       }, 500);
 
                     })
                     .fail(function(error) {
-                        vm.currentUser = '';
+                        vm.rtc.username = '';
                         if(error.responseText == '{"error": "Username already in use"}')
                             toastr.error('Nom d\'utilisateur déjà pris');
-                        rtc.fire('set_username_error', username, error);
+                        vm.rtc.fire('set_username_error', username, error);
                     });
             }
         };
 
-        rtc.packet_inbound = function(username, message) {
+        vm.rtc.packet_inbound = function(username, message) {
             message = message.sanitize();
-            rtc.fire('message', username, message, true);
+            vm.rtc.fire('message', username, message, true);
         };
 
         /* WebRTC SSE Callbacks */
-        rtc.on('connect', function() {
-            rtc.connected = true;
-            if (rtc.username)
-                rtc.set_username(rtc.username);
+        vm.rtc.on('connect', function() {
+            vm.rtc.connected = true;
+            if (vm.rtc.username)
+                vm.rtc.set_username(vm.rtc.username);
         })
 
         .on('hello', function(data) {
-            rtc.stream_id = data.stream_id;
+            vm.rtc.stream_id = data.stream_id;
         })
 
         .on('disconnect', function() {
-            rtc.connected = false;
+            vm.rtc.connected = false;
         })
 
         .on('get_peers', function(data) {
@@ -459,80 +460,80 @@
                 var user  = data.users[i];
                 var username = user.username = user.username.sanitize();
                 usernames.push(username);
-                rtc.create_peer_connection(username);
-                rtc.create_data_channel(username);
-                rtc.send_offer(username);
+                vm.rtc.create_peer_connection(username);
+                vm.rtc.create_data_channel(username);
+                vm.rtc.send_offer(username);
             }
-            rtc.usernames = usernames;
-            rtc.users = data.users;
-            rtc.first_connect = true;
-            rtc.fire('got_peers', data);
-            rtc.first_connect = false;
+            vm.rtc.usernames = usernames;
+            vm.rtc.users = data.users;
+            vm.rtc.first_connect = true;
+            vm.rtc.fire('got_peers', data);
+            vm.rtc.first_connect = false;
         })
 
         .on('set_username_success', function() {
-            if (rtc.room)
-                rtc.join_room(rtc.room);
+            if (vm.rtc.room)
+                vm.rtc.join_room(vm.rtc.room);
         })
 
         .on('user_join', function(data) {
-            rtc.usernames.push(data.username);
-            rtc.create_peer_connection(data.username);
-            var pc = rtc.create_peer_connection(data.username);
-            for (var i = 0; i < rtc.streams.length; i++) {
-                var stream = rtc.streams[i];
+            vm.rtc.usernames.push(data.username);
+            vm.rtc.create_peer_connection(data.username);
+            var pc = vm.rtc.create_peer_connection(data.username);
+            for (var i = 0; i < vm.rtc.streams.length; i++) {
+                var stream = vm.rtc.streams[i];
                 pc.addStream(stream);
            }
         })
 
         .on('remove_peer_connected', function(data) {
-            rtc.connected[data.username] = false;
-            rtc.fire('disconnect stream', data.username, rtc.usernames[data.username]);
-            delete rtc.dataChannels[data.username];
-            delete rtc.usernames[data.username];
-            delete rtc.peerConnections[data.username];
+            vm.rtc.connected[data.username] = false;
+            vm.rtc.fire('disconnect stream', data.username, vm.rtc.usernames[data.username]);
+            delete vm.rtc.dataChannels[data.username];
+            delete vm.rtc.usernames[data.username];
+            delete vm.rtc.peerConnections[data.username];
         })
 
         .on('receive_ice_candidate', function(data) {
             var candidate = new iceCandidate(JSON.parse(data.candidate));
-            rtc.peerConnections[data.username].addIceCandidate(candidate);
+            vm.rtc.peerConnections[data.username].addIceCandidate(candidate);
         })
         .on('receive_offer', function(data) {
-            rtc.receive_offer(data.username, data.sdp);
+            vm.rtc.receive_offer(data.username, data.sdp);
         })
         .on('receive_answer', function(data) {
-            rtc.receive_answer(data.username, data.sdp);
+            vm.rtc.receive_answer(data.username, data.sdp);
         })
         .on('user_leave', function(data) {
             var leaveUser = data.username ? data.username  : '';
             vm.removePeer(leaveUser);
         });
 
-        rtc.dataChannelConfig = {optional: [ {'DtlsSrtpKeyAgreement': true} ] };
+        vm.rtc.dataChannelConfig = {optional: [ {'DtlsSrtpKeyAgreement': true} ] };
         // Check if Data Channel is supported
         try {
-            var pc = new PeerConnection(rtc.STUN_SERVERS, rtc.dataChannelConfig);
+            var pc = new PeerConnection(vm.rtc.STUN_SERVERS, vm.rtc.dataChannelConfig);
             channel = pc.createDataChannel('supportCheck', { reliable: true });
             channel.close();
-            rtc.dataChannelSupport = reliable_true;
+            vm.rtc.dataChannelSupport = reliable_true;
         } catch(e) {
             try {
-                var pc = new PeerConnection(rtc.STUN_SERVERS, rtc.dataChannelConfig);
+                var pc = new PeerConnection(vm.rtc.STUN_SERVERS, vm.rtc.dataChannelConfig);
                 channel = pc.createDataChannel('supportCheck', { reliable: false });
                 channel.close();
-                rtc.dataChannelSupport = reliable_false;
+                vm.rtc.dataChannelSupport = reliable_false;
             } catch(e) {
-                rtc.dataChannelSupport = rtc_unsupported;
+                vm.rtc.dataChannelSupport = rtc_unsupported;
             }
         }
-        rtc.fire('data_channel_reliability');
+        vm.rtc.fire('data_channel_reliability');
 
         var $cont = $('#messages');
         var connection_icon = document.getElementById('connection_icon');
         var buffer_input = document.getElementById('buffer_input');
         var base_connection_icon = 'fa fa-circle ';
 
-        rtc.on('connecting', function() {
+        vm.rtc.on('connecting', function() {
             vm.connectionStatus = 'Connecting...';
             connection_icon.setAttribute('class', base_connection_icon + 'connecting');
         })
@@ -546,21 +547,21 @@
             connection_icon.setAttribute('class', base_connection_icon + 'offline');
         })
         .on ('set_username_success', function() {
-            toastr.success('Username successfully set to %0.'.f(rtc.username.bold()));
+            toastr.success('Username successfully set to %0.'.f(vm.rtc.username.bold()));
         })
         .on('joined_room', function() {
-            vm.currentRoom = rtc.room;
+            vm.currentRoom = vm.rtc.room;
         })
         .on ('got_peers', function() {
-            if (rtc.first_connect)
-                toastr.info('Entered ' + rtc.room);
+            if (vm.rtc.first_connect)
+                toastr.info('Entered ' + vm.rtc.room);
 
-          if (rtc.usernames.length === 0)
+          if (vm.rtc.usernames.length === 0)
                 return toastr.info('You are the only user in this room.');
 
             var users = '';
-            for (var x = 0; x < rtc.usernames.length; x++) {
-                users += rtc.usernames[x].bold() + ' ';
+            for (var x = 0; x < vm.rtc.usernames.length; x++) {
+                users += vm.rtc.usernames[x].bold() + ' ';
             }
             toastr.info('Users in room: ' + users);
         })
@@ -582,7 +583,7 @@
                 vm.messages[currentRoom].push(message);
             }
             $cont[0].scrollTop = $cont[0].scrollHeight;
-            if(username != vm.currentUser){
+            if(username != vm.rtc.username){
                soundthree.play();
             }
         });
@@ -603,7 +604,7 @@
             },1);
             if (input.length === 0)
                 return;
-            rtc.send(input);
+            vm.rtc.send(input);
             return false;
         });
 
@@ -630,10 +631,9 @@
             $('#createRoom').val('');
         });
 
-        window.rtc = MainCtrl.prototype.rtc = rtc;
-        rtc.connect(document.location.origin + '/stream');
+        window.rtc = vm.rtc;
+        vm.rtc.connect(document.location.origin + '/stream');
         console.log(MainCtrl.prototype);
-
     };
 
     /**
@@ -642,9 +642,10 @@
      */
     function LogCtrl($log) {
         var log = this;
-        rtc.log_data_stream_data = false;
-        rtc.log_heartbeat = false;
-        rtc.log_event_source_message = true;
+        var vm = MainCtrl.prototype;
+        vm.rtc.log_data_stream_data = false;
+        vm.rtc.log_heartbeat = false;
+        vm.rtc.log_event_source_message = true;
 
         this.apply = function() {
             var params = Array.prototype.slice.call(arguments, 0);
@@ -656,7 +657,7 @@
             return;
         };
 
-        rtc.on('error', function(error) {
+        vm.rtc.on('error', function(error) {
             log.apply('warning', '[ERROR] ' + error);
         })
 
@@ -675,7 +676,7 @@
         })
         .on('event_source_message', function(event) {
             var data = JSON.parse(event.data);
-            if ((data.event === 'heartbeat' && !rtc.log_heartbeat) || !rtc.log_event_source_message)
+            if ((data.event === 'heartbeat' && !vm.rtc.log_heartbeat) || !vm.rtc.log_event_source_message)
                 return;
             log.apply('log', 'Event source message', event);
         })
@@ -739,7 +740,7 @@
             log.apply('info', 'DataStream closed for ' + username);
         })
         .on('data_stream_data', function(username, message) {
-            if (rtc.log_data_stream_data)
+            if (vm.rtc.log_data_stream_data)
                 log.apply('log', 'received data from '+ username +': ' + 'message');
         })
         .on('data_channel_reliable', function() {
