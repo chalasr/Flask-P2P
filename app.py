@@ -364,4 +364,4 @@ def leave_rooms(newroom, username):
     return jsonify(success=True)
 
 if __name__ == '__main__':
-    app.run(threaded=True, host='0.0.0.0')
+    app.run('0.0.0.0')
