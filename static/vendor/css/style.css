@@ -115,11 +115,9 @@ a {
 .message .fa-lock {
 	color: green;
 }
-.message .chat-user,
-.message .fa-lock,
-.message .message-inner {
+.message-inner {
 	vertical-align: middle;
-	margin-left: 3px;
+	margin-left: 5px;
 }
 
 .input-group {

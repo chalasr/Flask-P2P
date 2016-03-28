@@ -8,12 +8,13 @@
 
     <title>Python</title>
     <link rel="stylesheet" type="text/css" href="static/vendor/css/bootstrap.min.css" />
+    <link rel="icon" href="static/favicon.png" />
     <link rel="stylesheet" type="text/css" href="static/vendor/css/style.css" />
     <link rel="stylesheet" type="text/css" href="static/vendor/fontawesome/css/font-awesome.css"/>
     <link rel="stylesheet" type="text/css" href="http://cdn.chalasdev.fr/css/toastr.min.css"/>
 </head>
 
-<body data-ng-controller="MainController">
+<body data-ng-controller="MainController as chat">
 
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container">
@@ -29,23 +30,23 @@
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>
-                        <a data-ng-if="currentUser == ''" id="username">Anonymous</a>
-                        <a data-ng-if="currentUser != ''" id="username"><% currentUser %></a>
+                        <a data-ng-if="chat.rtc.username == ''" id="username">Anonymous</a>
+                        <a data-ng-if="chat.rtc.username != ''" id="username"><% chat.rtc.username %></a>
                     </li>
-                    <li class="dropdown" data-ng-init="getRooms()" data-ng-click="getRooms()">
+                    <li class="dropdown" data-ng-init="chat.getRooms()" data-ng-click="chat.getRooms()">
                         <a href="" class="dropdown-toggle" data-toggle="dropdown">Rooms<b class="caret"></b></a>
                         <ul id="roomsMenu" class="dropdown-menu">
-                            <li class="column-dropdown" data-ng-repeat="room in rooms">
-                              <a class="joinRoom" data-room="<% room %>" data-ng-click="joinRoom(room)"><% room %></a>
+                            <li class="column-dropdown" data-ng-repeat="room in chat.rooms">
+                              <a data-ng-if="room != 'Lobby'" class="chat.joinRoom" data-room="<% room %>" data-ng-click="chat.joinRoom(room)"><% room %></a>
                             </li>
                         </ul>
                     </li>
 
-                    <li class="dropdown" data-ng-init="getUsers(room)" data-ng-click="getUsers(currentRoom)">
+                    <li class="dropdown" data-ng-init="chat.getUsers(room)" data-ng-click="chat.getUsers(currentRoom)">
                         <a href="" class="dropdown-toggle" data-toggle="dropdown">Users in room<b class="caret"></b></a>
                         <ul id="usersMenu" class="dropdown-menu">
-                            <li class="column-dropdown" data-ng-repeat="user in users[currentRoom]">
-                                <a data-ng-if="user != currentUser"><% user %></a>
+                            <li class="column-dropdown" data-ng-repeat="user in chat.users[chat.currentRoom]">
+                                <a data-ng-if="user != chat.rtc.username"><% user %></a>
                             </li>
                         </ul>
                     </li>
@@ -61,8 +62,8 @@
                 <ul class="nav navbar-nav navbar-right">
                     <li>
                         <span id="room_icon" class="fa fa-street-view" style="display:none"></span>
-                        <a data-ng-if="currentRoom == ''" id="room_name">Lobby</a>
-                        <a data-ng-if="currentRoom != ''" id="room_name"><% currentRoom %></a>
+                        <a data-ng-if="chat.currentRoom == ''" id="room_name">Lobby</a>
+                        <a data-ng-if="chat.currentRoom != ''" id="room_name"><% chat.currentRoom %></a>
                     </li>
 
                     <li class="">
@@ -73,12 +74,12 @@
             </div>
         </div>
     </nav>
-    <div class="container">
+    <div class="container" data-ng-controller="LogController">
 
         <div class="col-md-6" id="messages">
-          <div data-ng-if="messages[currentRoom]" class="messages" data-ng-repeat="msg in messages[currentRoom]">
-              <span data-ng-if="!msg.type" class="chat-user"><b><% msg.username %></b></span>
-              <span data-ng-if="!msg.type" class="fa fa-chevron-right"></span>
+          <div data-ng-if="chat.messages[chat.currentRoom]" class="messages" data-ng-repeat="msg in chat.messages[chat.currentRoom]">
+              <span style="font-size: 0.8em!important" class="text-muted"><i class="fa fa-clock-o"></i>&nbsp;<% msg.time %></span>&nbsp;
+              <span data-ng-if="!msg.type" style="color: #90CA0A!important" class="chat-user"><b><% msg.username %></b></span>
               <span data-ng-if="!msg.type" class="message-inner"><% msg.content %></span>
               <span data-ng-if="msg.type" class="message-inner info"><% msg.content %></span>
           </div>
@@ -86,12 +87,10 @@
 
         <div class="col-md-6 video-wrapper">
           <video id="localVideo" style="float:right;max-width:50%;border: solid 3px #90CA0A;" autoplay muted></video>
-          <video-player data-ng-repeat="peer in peers[currentRoom]">
-              <video autoplay style="float:right;max-width:50%;" id="<% peer.username %>" data-ng-src="<% getVideo(peer.stream) %>"></video>
+          <video-player data-ng-repeat="peer in chat.peers[chat.currentRoom]">
+              <video autoplay style="float:right;max-width:50%;" id="<% peer.username %>" data-ng-src="<% chat.getVideo(peer.stream) %>"></video>
           </video-player>
         </div>
-
-
     </div>
 
     <div class="col-lg-12" style="position:absolute; bottom:20px">
@@ -108,8 +107,8 @@
           </div>
           <div class="modal-body">
             <div>
-              <form data-ng-submit="login()">
-                <input autofocus data-ng-model="currentUser" id="login" type="text" class="form-control" placeholder="Set your nickname" />
+              <form data-ng-submit="chat.login()">
+                <input autofocus data-ng-model="chat.rtc.username" id="login" type="text" class="form-control" placeholder="Set your nickname" />
                 <br>
                 <span class="input-group-btn">
                 <button class="btn btn-primary btn-sm" id="btn-chat">Go</button>
