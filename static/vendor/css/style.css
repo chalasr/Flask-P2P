@@ -1,5 +1,5 @@
-@import url(http://fonts.googleapis.com/css?family=Lato:300,400,700,900);
-@import url(http://fonts.googleapis.com/css?family=Raleway:400,300,700,900);
+@import url(https://fonts.googleapis.com/css?family=Lato:300,400,700,900);
+@import url(https://fonts.googleapis.com/css?family=Raleway:400,300,700,900);
 body {
   padding-top: 70px;
   font-family: "Lato";
@@ -20,10 +20,10 @@ a {
 }
 
 .navbar-brand {
-	color:#90CA0A!important;
-	font-family:"Raleway";
-	font-size:21px;
-	font-weight:bold;
+  color:#90CA0A!important;
+  font-family:"Raleway";
+  font-size:21px;
+  font-weight:bold;
 }
 
 .navbar-default .navbar-nav > li > a:focus, .navbar-default .navbar-nav > li > a:hover {
@@ -32,7 +32,7 @@ a {
 }
 
 .navbar  {
-	max-height:50px;
+  max-height:50px;
 }
 
 .navbar a {
@@ -40,9 +40,9 @@ a {
 }
 
 .btn-primary {
-	color:#FFF;
-	background-color:#90CA0A;
-	border-color:#FFF;
+  color:#FFF;
+  background-color:#90CA0A;
+  border-color:#FFF;
 }
 
 .btn-primary.active, .btn-primary.focus, .btn-primary:active, .btn-primary:focus, .btn-primary:hover, .open > .dropdown-toggle.btn-primary {
@@ -53,8 +53,8 @@ a {
 
 .btn-default.active, .btn-default.focus, .btn-default:active, .btn-default:focus, .btn-default:hover, .open > .dropdown-toggle.btn-primary {
     color: #FFF;
-	background-color: #90CA0A;
-	border-color:#90CA0A;
+  background-color: #90CA0A;
+  border-color:#90CA0A;
 }
 
 .navbar-default .navbar-toggle:focus, .navbar-default .navbar-toggle:hover {
@@ -63,10 +63,10 @@ a {
 }
 
 .navbar-toggle {
-	border-style: none;
+  border-style: none;
 }
 .btn-default {
-	color: #90CA0A;
+  color: #90CA0A;
     background-color: #FFF;
     border-style:none;
 }
@@ -81,78 +81,78 @@ a {
 }
 
 .form-control:focus {
-	border-color: #5BC0DE
-	box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 8px rgba(44, 179, 30, 0.6);
+  border-color: #5BC0DE
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 8px rgba(44, 179, 30, 0.6);
 }
 
 .titlecontainer {
-	width:100%;
+  width:100%;
 }
 
 .titlecontainer h1 {
-	font-family:"Raleway";
+  font-family:"Raleway";
 }
 
 .online {
-	color: green;
+  color: green;
 }
 .offline {
-	color: #666;
+  color: #666;
 }
 .success {
-	color: #62C462;
+  color: #62C462;
 }
 .error {
-	color: #EE5F5B;
+  color: #EE5F5B;
 }
 .operation {
-	color: #F89406;
+  color: #F89406;
 }
 .info {
-	color: #5BC0DE;
+  color: #5BC0DE;
 }
 
 .message .fa-lock {
-	color: green;
+  color: green;
 }
 .message-inner {
-	vertical-align: middle;
-	margin-left: 5px;
+  vertical-align: middle;
+  margin-left: 5px;
 }
 
 .input-group {
-	display:block;
+  display:block;
 }
 
 .dropdown-menu {
-	min-width: 200px;
+  min-width: 200px;
 }
 
 .dropdown-menu.columns-2 {
-	min-width: 400px;
+  min-width: 400px;
 }
 
 .dropdown-menu li a {
-	padding: 5px 15px;
-	font-weight: 300;
+  padding: 5px 15px;
+  font-weight: 300;
 }
 
 .column-dropdown {
-	list-style: none;
-	padding-left:10px;
+  list-style: none;
+  padding-left:10px;
 }
 
 .column-dropdown a {
-	display: block;
-	clear: both;
-	line-height: 1.428571429;
-	color: #333;
-	white-space: normal;
+  display: block;
+  clear: both;
+  line-height: 1.428571429;
+  color: #333;
+  white-space: normal;
 }
 
 .column-dropdown a:hover {
-	text-decoration: none;
-	color: #262626;
+  text-decoration: none;
+  color: #262626;
 }
 .form-control:focus {
 -webkit-box-shadow: none!important;
@@ -162,40 +162,40 @@ a {
 }
 
 .navbar-toggle{
-	width:50px;
-	padding-top:2px;
-	height:30px;
+  width:50px;
+  padding-top:2px;
+  height:30px;
 }
 .createroom{
   margin-top: 7px;
 }
 
 .search{
-	margin-top: 5px;
-	margin-left: 5px;
+  margin-top: 5px;
+  margin-left: 5px;
 }
 
 .searchbar {
-	height:30px;
-	width: 80%;
-	float: left;
-	color:#777;
+  height:30px;
+  width: 80%;
+  float: left;
+  color:#777;
   margin-top:3px;
 }
 
 .searchbtn {
-	width: 20%;
-	float: left;
-	height:30px;
+  width: 20%;
+  float: left;
+  height:30px;
   margin-top:3px;
 }
 
 .searchbtn span {
-	color:#90CA0A;
+  color:#90CA0A;
 }
 .searchcontainer {
-	width: 85%;
-	float: left;
+  width: 85%;
+  float: left;
 }
 
 #messages{
@@ -204,22 +204,22 @@ a {
 }
 
 @media (max-width: 767px) {
-	.dropdown-menu.multi-column {
-		min-width: 240px !important;
-		overflow-x: hidden;
-	}
+  .dropdown-menu.multi-column {
+    min-width: 240px !important;
+    overflow-x: hidden;
+  }
 }
 
 @media (max-width: 380px) {
-	.power img {
-		width:100%;
-	}
+  .power img {
+    width:100%;
+  }
 }
 
 @media (max-width: 767px) {
-	.navbar {
-		max-height:100%;
-	}
+  .navbar {
+    max-height:100%;
+  }
 }
 
 #roomsMenu a:hover{
